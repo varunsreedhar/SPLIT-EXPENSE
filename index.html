@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitwise Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            min-height: calc(100vh - 20px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 15px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            background: #fafafa;
+        }
+
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 6px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            min-width: 60px;
+        }
+
+        .delete-btn:hover {
+            background: #da190b;
+        }
+
+        .edit-btn {
+            background: #2196F3;
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            min-width: 60px;
+            margin-right: 5px;
+        }
+
+        .edit-btn:hover {
+            background: #1976D2;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .download-btn {
+            background: #FF9800;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            background: #F57C00;
+        }
+
+
+
+        .member-item, .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .member-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .expense-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .expense-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .expense-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .results {
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+        }
+
+        .settlement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 12px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .amount {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 1.2em;
+        }
+
+        .negative-amount {
+            color: #f44336;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .summary-card .value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        /* Mobile-first design - no media queries needed */
+        .mobile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-row .member-name,
+        .mobile-row .expense-details {
+            flex: 1;
+        }
+
+        .undo-redo-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .undo-btn, .redo-btn {
+            background: #9E9E9E;
+            width: auto;
+            min-width: 70px;
+            font-size: 12px;
+            padding: 6px 10px;
+        }
+
+        .undo-btn:hover, .redo-btn:hover {
+            background: #757575;
+        }
+
+        .undo-btn:disabled, .redo-btn:disabled {
+            background: #E0E0E0;
+            color: #BDBDBD;
+            cursor: not-allowed;
+        }
+
+        .split-options {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .split-options h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .member-checkbox {
+            display: flex;
+            align-items: center;
+            margin: 3px 0;
+            padding: 4px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .member-checkbox input[type="checkbox"] {
+            margin-right: 6px;
+            width: auto;
+        }
+
+        .member-checkbox label {
+            font-size: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .split-summary {
+            margin-top: 8px;
+            padding: 6px;
+            background: #e8f5e8;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #333;
+        }
+
+        .toggle-section {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-header {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            border-radius: 8px 8px 0 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .toggle-header:hover {
+            background: #f0f0f0;
+        }
+
+        .toggle-content {
+            padding: 15px;
+            display: none;
+        }
+
+        .toggle-content.show {
+            display: block;
+        }
+
+        .toggle-arrow {
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+
+        .toggle-arrow.rotated {
+            transform: rotate(90deg);
+        }
+
+        .calculate-btn-highlight {
+            background: #FF5722 !important;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
+        }
+
+        .calculate-btn-highlight::after {
+            content: " (Recalculation needed!)";
+            font-size: 12px;
+            color: #fff;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(255, 87, 34, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 87, 34, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(255, 87, 34, 0.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Splitwise Calculator</h1>
+            <p>Easily split expenses among friends and family</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Add Members Section -->
+            <div class="section">
+                <h2>👥 Add Members</h2>
+                <div class="input-group">
+                    <input type="text" id="memberName" placeholder="Enter member name" />
+                    <button onclick="addMember()">Add Member</button>
+                </div>
+                <div id="membersList"></div>
+            </div>
+
+            <!-- Add Old Balances Section (Collapsible) -->
+            <div class="toggle-section">
+                <div class="toggle-header" onclick="toggleSection('oldBalancesContent')">
+                    <span>📋 Previous Balances</span>
+                    <span class="toggle-arrow" id="oldBalancesArrow">▶</span>
+                </div>
+                <div class="toggle-content" id="oldBalancesContent">
+                    <div class="input-group">
+                        <select id="oldBalanceFrom">
+                            <option value="">Who owes?</option>
+                        </select>
+                        <select id="oldBalanceTo">
+                            <option value="">To whom?</option>
+                        </select>
+                        <input type="number" id="oldBalanceAmount" placeholder="Amount owed" step="0.01" />
+                        <input type="date" id="oldBalanceDate" />
+                        <input type="text" id="oldBalanceDescription" placeholder="Description (optional)" />
+                        <button onclick="addOldBalance()">Add Previous Balance</button>
+                    </div>
+                    <div id="oldBalancesList"></div>
+                </div>
+            </div>
+
+            <!-- Add Expenses Section -->
+            <div class="section">
+                <h2>💳 Add Expenses</h2>
+                <div class="undo-redo-buttons">
+                    <button class="undo-btn" id="undoBtn" onclick="undo()" disabled>↶ Undo</button>
+                    <button class="redo-btn" id="redoBtn" onclick="redo()" disabled>↷ Redo</button>
+                </div>
+                <div class="input-group">
+                    <select id="expenseCategory">
+                        <option value="">Select Category</option>
+                        <option value="food">🍽️ Food & Dining</option>
+                        <option value="water">💧 Water & Drinks</option>
+                        <option value="bottle">🍼 Bottle/Container</option>
+                        <option value="transport">🚗 Transport</option>
+                        <option value="entertainment">🎬 Entertainment</option>
+                        <option value="shopping">🛒 Shopping</option>
+                        <option value="bills">📄 Bills & Utilities</option>
+                        <option value="medical">🏥 Medical</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                    <input type="text" id="expenseDescription" placeholder="Expense description (e.g., Dinner, Movie tickets)" />
+                    <input type="number" id="expenseAmount" placeholder="Amount" step="0.01" />
+                    <select id="paidBy">
+                        <option value="">Who paid?</option>
+                    </select>
+                    <div class="split-options" id="splitOptions">
+                        <h4>👥 Who should split this expense?</h4>
+                        <div id="memberCheckboxes"></div>
+                        <div class="split-summary" id="splitSummary"></div>
+                    </div>
+                    <button onclick="addExpense()">Add Expense</button>
+                </div>
+                <div id="expensesList"></div>
+            </div>
+
+            <!-- Calculate & Results Section -->
+            <div class="section">
+                <button id="calculateBtn" onclick="calculateSplit()" style="padding: 12px; font-size: 16px; margin-bottom: 15px; font-weight: 600;">
+                    🧮 Calculate Split
+                </button>
+                
+                <div id="results" class="results" style="display: none;">
+                    <h2>📊 Results</h2>
+                    <div id="summary"></div>
+                    <div id="settlements"></div>
+                    <div class="data-controls">
+                        <button class="download-btn" onclick="downloadPDF()">
+                            📄 Download PDF Report
+                        </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let members = ['Varun Sreedharan', 'Riju Abraham', 'Praveen P'];
+        let expenses = [];
+        let oldBalances = [];
+        let actionHistory = [];
+        let historyIndex = -1;
+        let needsRecalculation = false;
+
+        function addMember() {
+            const nameInput = document.getElementById('memberName');
+            const name = nameInput.value.trim();
+
+            if (name === '') {
+                alert('Please enter a member name');
+                return;
+            }
+
+            if (members.includes(name)) {
+                alert('Member already exists');
+                return;
+            }
+
+            saveState('add_member');
+            members.push(name);
+            nameInput.value = '';
+            markRecalculationNeeded();
+            updateMembersList();
+            updatePaidByDropdown();
+            updateOldBalanceDropdowns();
+            updateMemberCheckboxes();
+        }
+
+        function removeMember(name) {
+            saveState('remove_member');
+            members = members.filter(member => member !== name);
+            expenses = expenses.filter(expense => expense.paidBy !== name);
+            oldBalances = oldBalances.filter(balance => balance.from !== name && balance.to !== name);
+            markRecalculationNeeded();
+            updateMembersList();
+            updatePaidByDropdown();
+            updateOldBalanceDropdowns();
+            updateMemberCheckboxes();
+            updateExpensesList();
+            updateOldBalancesList();
+        }
+
+        function updateMembersList() {
+            const membersList = document.getElementById('membersList');
+            membersList.innerHTML = '';
+
+            members.forEach(member => {
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'member-item';
+                memberDiv.innerHTML = `
+                    <span class="member-name">${member}</span>
+                    <button class="delete-btn" onclick="removeMember('${member}')">Remove</button>
+                `;
+                membersList.appendChild(memberDiv);
+            });
+        }
+
+        function updatePaidByDropdown() {
+            const paidBySelect = document.getElementById('paidBy');
+            paidBySelect.innerHTML = '<option value="">Who paid?</option>';
+
+            members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member;
+                option.textContent = member;
+                paidBySelect.appendChild(option);
+            });
+        }
+
+        function updateMemberCheckboxes() {
+            const checkboxContainer = document.getElementById('memberCheckboxes');
+            checkboxContainer.innerHTML = '';
+
+            members.forEach(member => {
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'member-checkbox';
+                checkboxDiv.innerHTML = `
+                    <input type="checkbox" id="split_${member}" value="${member}" checked onchange="updateSplitSummary()">
+                    <label for="split_${member}">${member}</label>
+                `;
+                checkboxContainer.appendChild(checkboxDiv);
+            });
+
+            updateSplitSummary();
+        }
+
+        function updateSplitSummary() {
+            const checkboxes = document.querySelectorAll('#memberCheckboxes input[type="checkbox"]:checked');
+            const selectedMembers = Array.from(checkboxes).map(cb => cb.value);
+            const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
+            const perPersonAmount = selectedMembers.length > 0 ? amount / selectedMembers.length : 0;
+
+            const summaryDiv = document.getElementById('splitSummary');
+            if (selectedMembers.length === 0) {
+                summaryDiv.innerHTML = '⚠️ Please select at least one person to split this expense';
+                summaryDiv.style.background = '#ffebee';
+                summaryDiv.style.color = '#c62828';
+            } else {
+                summaryDiv.innerHTML = `💰 ${selectedMembers.length} people selected • ₹${perPersonAmount.toFixed(2)} per person`;
+                summaryDiv.style.background = '#e8f5e8';
+                summaryDiv.style.color = '#333';
+            }
+        }
+
+        function updateOldBalanceDropdowns() {
+            const fromSelect = document.getElementById('oldBalanceFrom');
+            const toSelect = document.getElementById('oldBalanceTo');
+
+            fromSelect.innerHTML = '<option value="">Who owes?</option>';
+            toSelect.innerHTML = '<option value="">To whom?</option>';
+
+            members.forEach(member => {
+                const fromOption = document.createElement('option');
+                fromOption.value = member;
+                fromOption.textContent = member;
+                fromSelect.appendChild(fromOption);
+
+                const toOption = document.createElement('option');
+                toOption.value = member;
+                toOption.textContent = member;
+                toSelect.appendChild(toOption);
+            });
+        }
+
+        function addExpense() {
+            const category = document.getElementById('expenseCategory').value;
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const paidBy = document.getElementById('paidBy').value;
+
+            // Get selected members for splitting
+            const checkboxes = document.querySelectorAll('#memberCheckboxes input[type="checkbox"]:checked');
+            const splitBetween = Array.from(checkboxes).map(cb => cb.value);
+
+            if (category === '' || description === '' || isNaN(amount) || amount <= 0 || paidBy === '') {
+                alert('Please fill all expense fields correctly including category');
+                return;
+            }
+
+            if (splitBetween.length === 0) {
+                alert('Please select at least one person to split this expense');
+                return;
+            }
+
+            // Save current state for undo
+            saveState('add_expense');
+
+            const expense = {
+                id: Date.now(),
+                category,
+                description,
+                amount,
+                paidBy,
+                splitBetween: [...splitBetween] // Array of members who should split this expense
+            };
+
+            expenses.push(expense);
+
+            // Clear inputs
+            document.getElementById('expenseCategory').value = '';
+            document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('paidBy').value = '';
+
+            // Reset checkboxes to all selected
+            updateMemberCheckboxes();
+
+            // Mark that recalculation is needed
+            markRecalculationNeeded();
+
+            updateExpensesList();
+        }
+
+        function removeExpense(id) {
+            saveState('remove_expense');
+            expenses = expenses.filter(expense => expense.id !== id);
+            markRecalculationNeeded();
+            updateExpensesList();
+        }
+
+        function editExpense(id) {
+            const expense = expenses.find(exp => exp.id === id);
+            if (!expense) return;
+
+            // Fill the form with existing expense data
+            document.getElementById('expenseCategory').value = expense.category || '';
+            document.getElementById('expenseDescription').value = expense.description;
+            document.getElementById('expenseAmount').value = expense.amount;
+            document.getElementById('paidBy').value = expense.paidBy;
+
+            // Set the split checkboxes based on the expense
+            if (expense.splitBetween) {
+                // Uncheck all first
+                document.querySelectorAll('#memberCheckboxes input[type="checkbox"]').forEach(cb => {
+                    cb.checked = expense.splitBetween.includes(cb.value);
+                });
+            }
+            updateSplitSummary();
+
+            // Remove the expense from the list (it will be re-added when user clicks "Add Expense")
+            removeExpense(id);
+
+            // Mark that recalculation is needed (already done in removeExpense, but emphasize for editing)
+            markRecalculationNeeded();
+
+            // Scroll to the expense form
+            document.getElementById('expenseCategory').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('expenseCategory').focus();
+
+            // Show a temporary message
+            showEditMessage();
+        }
+
+        function showEditMessage() {
+            const existingMessage = document.getElementById('editMessage');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const message = document.createElement('div');
+            message.id = 'editMessage';
+            message.style.cssText = `
+                background: #2196F3;
+                color: white;
+                padding: 10px;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                text-align: center;
+                font-size: 14px;
+            `;
+            message.textContent = '✏️ Expense loaded for editing. Modify the details and click "Add Expense" to save changes.';
+
+            const expenseSection = document.querySelector('.section:nth-child(3)');
+            expenseSection.insertBefore(message, expenseSection.children[1]);
+
+            // Remove message after 5 seconds
+            setTimeout(() => {
+                if (document.getElementById('editMessage')) {
+                    document.getElementById('editMessage').remove();
+                }
+            }, 5000);
+        }
+
+        function updateExpensesList() {
+            const expensesList = document.getElementById('expensesList');
+            expensesList.innerHTML = '';
+
+            expenses.forEach(expense => {
+                const expenseDiv = document.createElement('div');
+                expenseDiv.className = 'expense-item';
+                const splitInfo = expense.splitBetween ?
+                    `Split between: ${expense.splitBetween.join(', ')} (₹${(expense.amount / expense.splitBetween.length).toFixed(2)} each)` :
+                    `Split equally among all members`;
+
+                // Get category display
+                const categoryDisplay = getCategoryDisplay(expense.category);
+
+                expenseDiv.innerHTML = `
+                    <div class="expense-details">
+                        <div class="expense-title">${categoryDisplay} ${expense.description}</div>
+                        <div class="expense-info">Paid by ${expense.paidBy} • ₹${expense.amount.toFixed(2)}</div>
+                        <div class="expense-info" style="font-size: 12px; color: #666;">${splitInfo}</div>
+                    </div>
+                    <div class="button-group">
+                        <button class="edit-btn" onclick="editExpense(${expense.id})">Edit</button>
+                        <button class="delete-btn" onclick="removeExpense(${expense.id})">Remove</button>
+                    </div>
+                `;
+                expensesList.appendChild(expenseDiv);
+            });
+        }
+
+        function getCategoryDisplay(category) {
+            const categories = {
+                'food': '🍽️',
+                'water': '💧',
+                'bottle': '🍼',
+                'transport': '🚗',
+                'entertainment': '🎬',
+                'shopping': '🛒',
+                'bills': '📄',
+                'medical': '🏥',
+                'other': '📦'
+            };
+            return categories[category] || '📦';
+        }
+
+        function getCategoryName(category) {
+            const categoryNames = {
+                'food': 'FOOD',
+                'water': 'WATER',
+                'bottle': 'BOTTLE',
+                'transport': 'TRANSPORT',
+                'entertainment': 'ENTERTAINMENT',
+                'shopping': 'SHOPPING',
+                'bills': 'BILLS',
+                'medical': 'MEDICAL',
+                'other': 'OTHER'
+            };
+            return categoryNames[category] || 'OTHER';
+        }
+
+        function calculateSplit() {
+            if (members.length === 0) {
+                alert('Please add at least one member');
+                return;
+            }
+
+            if (expenses.length === 0 && oldBalances.length === 0) {
+                alert('Please add at least one expense or old balance');
+                return;
+            }
+
+            // Calculate total expenses
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+            // Initialize balances for all members
+            const balances = {};
+            members.forEach(member => {
+                balances[member] = 0;
+            });
+
+            // Process each expense with correct advanced splitting logic
+            expenses.forEach(expense => {
+                const splitBetween = expense.splitBetween || members; // Default to all members if not specified
+                const perPersonShare = expense.amount / splitBetween.length;
+
+                // Person who paid gets credited with the full amount
+                balances[expense.paidBy] += expense.amount;
+
+                // Only people who should split this expense get debited their share
+                splitBetween.forEach(member => {
+                    if (!balances[member]) balances[member] = 0;
+                    balances[member] -= perPersonShare;
+                });
+            });
+
+            // Add old balances to the calculation
+            oldBalances.forEach(oldBalance => {
+                if (!balances[oldBalance.from]) balances[oldBalance.from] = 0;
+                if (!balances[oldBalance.to]) balances[oldBalance.to] = 0;
+
+                balances[oldBalance.from] -= oldBalance.amount; // Person who owes money
+                balances[oldBalance.to] += oldBalance.amount;   // Person who is owed money
+            });
+
+            // Calculate average per person for display - this is just for display purposes
+            // It shows what each person would pay if all expenses were split equally among everyone
+            const perPersonShare = totalExpenses / members.length;
+
+            // Generate settlements
+            const settlements = generateSettlements(balances);
+
+            // Clear the recalculation highlight
+            clearRecalculationHighlight();
+
+            displayResults(totalExpenses, perPersonShare, balances, settlements);
+        }
+
+        function generateSettlements(balances) {
+            const settlements = [];
+            const creditors = []; // People who are owed money
+            const debtors = []; // People who owe money
+            
+            Object.entries(balances).forEach(([person, balance]) => {
+                if (balance > 0.01) {
+                    creditors.push({ person, amount: balance });
+                } else if (balance < -0.01) {
+                    debtors.push({ person, amount: -balance });
+                }
+            });
+            
+            // Sort by amount for optimal settlements
+            creditors.sort((a, b) => b.amount - a.amount);
+            debtors.sort((a, b) => b.amount - a.amount);
+            
+            let i = 0, j = 0;
+            while (i < creditors.length && j < debtors.length) {
+                const creditor = creditors[i];
+                const debtor = debtors[j];
+                
+                const settleAmount = Math.min(creditor.amount, debtor.amount);
+                
+                settlements.push({
+                    from: debtor.person,
+                    to: creditor.person,
+                    amount: settleAmount
+                });
+                
+                creditor.amount -= settleAmount;
+                debtor.amount -= settleAmount;
+                
+                if (creditor.amount < 0.01) i++;
+                if (debtor.amount < 0.01) j++;
+            }
+            
+            return settlements;
+        }
+
+        function displayResults(totalExpenses, perPersonShare, balances, settlements) {
+            const resultsDiv = document.getElementById('results');
+            const summaryDiv = document.getElementById('summary');
+            const settlementsDiv = document.getElementById('settlements');
+            
+            // Summary
+            summaryDiv.innerHTML = `
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Total Expenses</h3>
+                        <div class="value">₹${totalExpenses.toFixed(2)}</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Per Person Share</h3>
+                        <div class="value">₹${perPersonShare.toFixed(2)}</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Total Members</h3>
+                        <div class="value">${members.length}</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 20px 0 10px 0;">Individual Balances:</h3>
+            `;
+            
+            Object.entries(balances).forEach(([person, balance]) => {
+                const balanceDiv = document.createElement('div');
+                balanceDiv.className = 'settlement-item';
+                const isPositive = balance > 0.01;
+                const isNegative = balance < -0.01;
+                
+                balanceDiv.innerHTML = `
+                    <span>${person}</span>
+                    <span class="amount ${isNegative ? 'negative-amount' : ''}">
+                        ${isPositive ? 'Gets back: ' : isNegative ? 'Owes: ' : 'Settled: '}
+                        ₹${Math.abs(balance).toFixed(2)}
+                    </span>
+                `;
+                summaryDiv.appendChild(balanceDiv);
+            });
+            
+            // Settlements
+            settlementsDiv.innerHTML = '<h3 style="margin: 20px 0 10px 0;">💸 Settlements Required:</h3>';
+            
+            if (settlements.length === 0) {
+                settlementsDiv.innerHTML += '<p style="text-align: center; color: #4CAF50; font-size: 18px;">🎉 All settled! No payments needed.</p>';
+            } else {
+                settlements.forEach(settlement => {
+                    const settlementDiv = document.createElement('div');
+                    settlementDiv.className = 'settlement-item';
+                    settlementDiv.innerHTML = `
+                        <span><strong>${settlement.from}</strong> pays <strong>${settlement.to}</strong></span>
+                        <span class="amount">₹${settlement.amount.toFixed(2)}</span>
+                    `;
+                    settlementsDiv.appendChild(settlementDiv);
+                });
+            }
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        function addOldBalance() {
+            const from = document.getElementById('oldBalanceFrom').value;
+            const to = document.getElementById('oldBalanceTo').value;
+            const amount = parseFloat(document.getElementById('oldBalanceAmount').value);
+            const date = document.getElementById('oldBalanceDate').value;
+            const description = document.getElementById('oldBalanceDescription').value.trim();
+
+            if (from === '' || to === '' || isNaN(amount) || amount <= 0 || date === '') {
+                alert('Please fill all required old balance fields correctly');
+                return;
+            }
+
+            if (from === to) {
+                alert('A person cannot owe money to themselves');
+                return;
+            }
+
+            const oldBalance = {
+                id: Date.now(),
+                from,
+                to,
+                amount,
+                date,
+                description: description || 'Previous balance'
+            };
+
+            oldBalances.push(oldBalance);
+
+            // Clear inputs
+            document.getElementById('oldBalanceFrom').value = '';
+            document.getElementById('oldBalanceTo').value = '';
+            document.getElementById('oldBalanceAmount').value = '';
+            document.getElementById('oldBalanceDate').value = '';
+            document.getElementById('oldBalanceDescription').value = '';
+
+            // Mark that recalculation is needed
+            markRecalculationNeeded();
+
+            updateOldBalancesList();
+        }
+
+        function removeOldBalance(id) {
+            oldBalances = oldBalances.filter(balance => balance.id !== id);
+            markRecalculationNeeded();
+            updateOldBalancesList();
+        }
+
+        function updateOldBalancesList() {
+            const oldBalancesList = document.getElementById('oldBalancesList');
+            oldBalancesList.innerHTML = '';
+
+            oldBalances.forEach(balance => {
+                const balanceDiv = document.createElement('div');
+                balanceDiv.className = 'expense-item';
+                balanceDiv.innerHTML = `
+                    <div class="expense-details">
+                        <div class="expense-title">${balance.description}</div>
+                        <div class="expense-info">${balance.from} owes ${balance.to} • ₹${balance.amount.toFixed(2)} • ${new Date(balance.date).toLocaleDateString('en-IN')}</div>
+                    </div>
+                    <div class="button-group">
+                        <button class="edit-btn" onclick="editOldBalance(${balance.id})">Edit</button>
+                        <button class="delete-btn" onclick="removeOldBalance(${balance.id})">Remove</button>
+                    </div>
+                `;
+                oldBalancesList.appendChild(balanceDiv);
+            });
+        }
+
+        function editOldBalance(id) {
+            const balance = oldBalances.find(bal => bal.id === id);
+            if (!balance) return;
+
+            // Fill the form with existing balance data
+            document.getElementById('oldBalanceFrom').value = balance.from;
+            document.getElementById('oldBalanceTo').value = balance.to;
+            document.getElementById('oldBalanceAmount').value = balance.amount;
+            document.getElementById('oldBalanceDate').value = balance.date;
+            document.getElementById('oldBalanceDescription').value = balance.description;
+
+            // Remove the balance from the list (it will be re-added when user clicks "Add Old Balance")
+            removeOldBalance(id);
+
+            // Scroll to the old balance form
+            document.getElementById('oldBalanceFrom').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('oldBalanceFrom').focus();
+
+            // Show a temporary message
+            showOldBalanceEditMessage();
+        }
+
+        function showOldBalanceEditMessage() {
+            const existingMessage = document.getElementById('oldBalanceEditMessage');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const message = document.createElement('div');
+            message.id = 'oldBalanceEditMessage';
+            message.style.cssText = `
+                background: #2196F3;
+                color: white;
+                padding: 10px;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                text-align: center;
+                font-size: 14px;
+            `;
+            message.textContent = '✏️ Old balance loaded for editing. Modify the details and click "Add Old Balance" to save changes.';
+
+            const oldBalanceSection = document.querySelector('.section:nth-child(2)');
+            oldBalanceSection.insertBefore(message, oldBalanceSection.children[1]);
+
+            // Remove message after 5 seconds
+            setTimeout(() => {
+                if (document.getElementById('oldBalanceEditMessage')) {
+                    document.getElementById('oldBalanceEditMessage').remove();
+                }
+            }, 5000);
+        }
+
+        // Undo/Redo functionality
+        function saveState(action) {
+            // Remove any future history if we're not at the end
+            if (historyIndex < actionHistory.length - 1) {
+                actionHistory = actionHistory.slice(0, historyIndex + 1);
+            }
+
+            // Save current state
+            const state = {
+                action,
+                timestamp: Date.now(),
+                members: [...members],
+                expenses: JSON.parse(JSON.stringify(expenses)),
+                oldBalances: JSON.parse(JSON.stringify(oldBalances))
+            };
+
+            actionHistory.push(state);
+            historyIndex++;
+
+            // Limit history to 20 actions
+            if (actionHistory.length > 20) {
+                actionHistory.shift();
+                historyIndex--;
+            }
+
+            updateUndoRedoButtons();
+        }
+
+        function undo() {
+            if (historyIndex >= 0) {
+                const state = actionHistory[historyIndex];
+                members = [...state.members];
+                expenses = JSON.parse(JSON.stringify(state.expenses));
+                oldBalances = JSON.parse(JSON.stringify(state.oldBalances));
+
+                historyIndex--;
+                updateAllDisplays();
+                updateUndoRedoButtons();
+            }
+        }
+
+        function redo() {
+            if (historyIndex < actionHistory.length - 1) {
+                historyIndex++;
+                const state = actionHistory[historyIndex];
+                members = [...state.members];
+                expenses = JSON.parse(JSON.stringify(state.expenses));
+                oldBalances = JSON.parse(JSON.stringify(state.oldBalances));
+
+                updateAllDisplays();
+                updateUndoRedoButtons();
+            }
+        }
+
+        function updateUndoRedoButtons() {
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+
+            undoBtn.disabled = historyIndex < 0;
+            redoBtn.disabled = historyIndex >= actionHistory.length - 1;
+        }
+
+        function updateAllDisplays() {
+            updateMembersList();
+            updatePaidByDropdown();
+            updateOldBalanceDropdowns();
+            updateMemberCheckboxes();
+            updateExpensesList();
+            updateOldBalancesList();
+        }
+
+
+
+
+
+
+
+
+
+        // Recalculation highlight functions
+        function markRecalculationNeeded() {
+            needsRecalculation = true;
+            const calculateBtn = document.getElementById('calculateBtn');
+            calculateBtn.classList.add('calculate-btn-highlight');
+        }
+
+        function clearRecalculationHighlight() {
+            needsRecalculation = false;
+            const calculateBtn = document.getElementById('calculateBtn');
+            calculateBtn.classList.remove('calculate-btn-highlight');
+        }
+
+        // Toggle section functionality
+        function toggleSection(contentId) {
+            const content = document.getElementById(contentId);
+            const arrow = document.getElementById(contentId.replace('Content', 'Arrow'));
+
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                arrow.classList.remove('rotated');
+            } else {
+                content.classList.add('show');
+                arrow.classList.add('rotated');
+            }
+        }
+
+        // Initialize application on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Use default members
+            updateMembersList();
+            updatePaidByDropdown();
+            updateOldBalanceDropdowns();
+            updateMemberCheckboxes();
+
+            // Set today's date as default for old balance date
+            document.getElementById('oldBalanceDate').value = new Date().toISOString().split('T')[0];
+
+            // Add event listener for amount input to update split summary
+            document.getElementById('expenseAmount').addEventListener('input', updateSplitSummary);
+        });
+
+        // Allow Enter key to add members and expenses
+        document.getElementById('memberName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addMember();
+        });
+
+        document.getElementById('expenseCategory').addEventListener('change', function(e) {
+            if (e.target.value) document.getElementById('expenseDescription').focus();
+        });
+
+        document.getElementById('expenseDescription').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('expenseAmount').focus();
+        });
+
+        document.getElementById('expenseAmount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('paidBy').focus();
+        });
+
+        function downloadPDF() {
+            if (members.length === 0 || expenses.length === 0) {
+                alert('Please add members and expenses before downloading the report');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Calculate data for the report (same logic as calculateSplit)
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPersonShare = totalExpenses / members.length;
+
+            // Initialize balances for all members
+            const balances = {};
+            members.forEach(member => {
+                balances[member] = 0;
+            });
+
+            // Process each expense with correct advanced splitting logic
+            expenses.forEach(expense => {
+                const splitBetween = expense.splitBetween || members;
+                const perPersonShare = expense.amount / splitBetween.length;
+
+                // Person who paid gets credited
+                balances[expense.paidBy] += expense.amount;
+
+                // Only people who should split this expense get debited
+                splitBetween.forEach(member => {
+                    if (!balances[member]) balances[member] = 0;
+                    balances[member] -= perPersonShare;
+                });
+            });
+
+            // Add old balances to the calculation for PDF
+            oldBalances.forEach(oldBalance => {
+                if (!balances[oldBalance.from]) balances[oldBalance.from] = 0;
+                if (!balances[oldBalance.to]) balances[oldBalance.to] = 0;
+
+                balances[oldBalance.from] -= oldBalance.amount;
+                balances[oldBalance.to] += oldBalance.amount;
+            });
+
+            const settlements = generateSettlements(balances);
+
+            // Professional PDF Header
+            doc.setFontSize(20);
+            doc.setTextColor(76, 175, 80);
+            doc.text('EXPENSE SPLIT REPORT', 105, 25, { align: 'center' });
+
+            // Header underline
+            doc.setLineWidth(1);
+            doc.setDrawColor(76, 175, 80);
+            doc.line(40, 30, 170, 30);
+
+            // Info box with proper alignment
+            doc.setFillColor(248, 255, 248);
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(20, 35, 170, 18, 'FD');
+
+            doc.setFontSize(10);
+            doc.setTextColor(60, 60, 60);
+            doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 25, 42);
+            doc.text(`Time: ${new Date().toLocaleTimeString('en-IN')}`, 25, 48);
+            doc.text(`Prepared by: Varun Sreedharan`, 110, 42);
+            doc.text(`Total Items: ${expenses.length + oldBalances.length}`, 110, 48);
+
+            // Professional Summary Section
+            let yPos = 65;
+            doc.setFontSize(14);
+            doc.setTextColor(76, 175, 80);
+            doc.text('SUMMARY', 20, yPos);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos + 2, 55, yPos + 2);
+
+            yPos += 10;
+
+            // Summary table with proper alignment
+            doc.setFillColor(248, 248, 248);
+            doc.rect(20, yPos, 170, 25, 'F');
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(20, yPos, 170, 25);
+
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Total Expenses:', 25, yPos + 8);
+            doc.text(`Rs. ${totalExpenses.toFixed(2)}`, 150, yPos + 8, { align: 'right' });
+
+            doc.text('Total Members:', 25, yPos + 15);
+            doc.text(`${members.length}`, 150, yPos + 15, { align: 'right' });
+
+            doc.text('Per Person Share:', 25, yPos + 22);
+            doc.text(`Rs. ${perPersonShare.toFixed(2)}`, 150, yPos + 22, { align: 'right' });
+
+            yPos += 35;
+
+            // Professional Members Section
+            doc.setFontSize(14);
+            doc.setTextColor(76, 175, 80);
+            doc.text('MEMBERS', 20, yPos);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos + 2, 60, yPos + 2);
+
+            yPos += 10;
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+
+            // Members table with alternating rows
+            members.forEach((member, index) => {
+                if (index % 2 === 0) {
+                    doc.setFillColor(248, 248, 248);
+                    doc.rect(20, yPos - 2, 170, 10, 'F');
+                }
+                doc.setDrawColor(220, 220, 220);
+                doc.rect(20, yPos - 2, 170, 10);
+
+                doc.setTextColor(60, 60, 60);
+                doc.text(`${index + 1}.`, 25, yPos + 4);
+                doc.text(member, 35, yPos + 4);
+                yPos += 10;
+            });
+
+            yPos += 10;
+
+            // Professional Expenses Section
+            doc.setFontSize(14);
+            doc.setTextColor(76, 175, 80);
+            doc.text('EXPENSES BREAKDOWN', 20, yPos);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos + 2, 95, yPos + 2);
+
+            yPos += 10;
+            doc.setFontSize(10);
+
+            let itemIndex = 0;
+
+            // Add old balances with professional formatting
+            if (oldBalances.length > 0) {
+                doc.setTextColor(244, 67, 54);
+                doc.text('Previous Balances:', 20, yPos);
+                yPos += 8;
+
+                oldBalances.forEach((balance) => {
+                    if (yPos > 240) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    // Professional row formatting with better height
+                    if (itemIndex % 2 === 0) {
+                        doc.setFillColor(255, 248, 248);
+                        doc.rect(20, yPos - 2, 170, 18, 'F');
+                    }
+                    doc.setDrawColor(220, 220, 220);
+                    doc.rect(20, yPos - 2, 170, 18);
+
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`${itemIndex + 1}.`, 25, yPos + 3);
+
+                    // Handle long text with word wrapping for old balances
+                    const balanceTitle = `[PREVIOUS] ${balance.description}`;
+                    const maxWidth = 80;
+                    const wrappedTitle = doc.splitTextToSize(balanceTitle, maxWidth);
+                    doc.text(wrappedTitle, 35, yPos + 3);
+
+                    // Amount aligned to the right
+                    doc.text(`Rs. ${balance.amount.toFixed(2)}`, 165, yPos + 3, { align: 'right' });
+
+                    // Second line with transaction details
+                    doc.setTextColor(100, 100, 100);
+                    doc.setFontSize(9);
+                    doc.text(`${balance.from} owes ${balance.to}`, 25, yPos + 10);
+                    doc.text(`Date: ${new Date(balance.date).toLocaleDateString('en-IN')}`, 25, yPos + 14);
+
+                    // Reset font size
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+
+                    yPos += 20;
+                    itemIndex++;
+                });
+
+                yPos += 5;
+            }
+
+            // Add current expenses with professional formatting
+            if (expenses.length > 0) {
+                doc.setTextColor(76, 175, 80);
+                doc.text('Current Expenses:', 20, yPos);
+                yPos += 8;
+
+                expenses.forEach((expense) => {
+                    if (yPos > 240) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    // Professional row formatting with better height
+                    if (itemIndex % 2 === 0) {
+                        doc.setFillColor(248, 255, 248);
+                        doc.rect(20, yPos - 2, 170, 18, 'F');
+                    }
+                    doc.setDrawColor(220, 220, 220);
+                    doc.rect(20, yPos - 2, 170, 18);
+
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`${itemIndex + 1}.`, 25, yPos + 3);
+
+                    // Add category name instead of emoji for PDF compatibility
+                    const categoryName = getCategoryName(expense.category);
+                    const expenseTitle = `[${categoryName}] ${expense.description}`;
+
+                    // Handle long text with word wrapping
+                    const maxWidth = 80;
+                    const wrappedTitle = doc.splitTextToSize(expenseTitle, maxWidth);
+                    doc.text(wrappedTitle, 35, yPos + 3);
+
+                    // Amount aligned to the right
+                    doc.text(`Rs. ${expense.amount.toFixed(2)}`, 165, yPos + 3, { align: 'right' });
+
+                    // Second line with payment and split info
+                    doc.setTextColor(100, 100, 100);
+                    doc.setFontSize(9);
+                    doc.text(`Paid by: ${expense.paidBy}`, 25, yPos + 10);
+
+                    const splitInfo = expense.splitBetween ?
+                        `Split: ${expense.splitBetween.join(', ')}` :
+                        'Split: All members';
+                    const wrappedSplitInfo = doc.splitTextToSize(splitInfo, 80);
+                    doc.text(wrappedSplitInfo, 25, yPos + 14);
+
+                    // Reset font size
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+
+                    yPos += 20;
+                    itemIndex++;
+                });
+            }
+
+            // Professional Individual Balances Section
+            if (yPos > 200) {
+                doc.addPage();
+                yPos = 20;
+            } else {
+                yPos += 10;
+            }
+
+            doc.setFontSize(14);
+            doc.setTextColor(76, 175, 80);
+            doc.text('INDIVIDUAL BALANCES', 20, yPos);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos + 2, 95, yPos + 2);
+
+            yPos += 10;
+            doc.setFontSize(11);
+
+            Object.entries(balances).forEach(([person, balance], index) => {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+
+                // Professional table formatting
+                if (index % 2 === 0) {
+                    doc.setFillColor(248, 248, 248);
+                    doc.rect(20, yPos - 2, 170, 10, 'F');
+                }
+                doc.setDrawColor(220, 220, 220);
+                doc.rect(20, yPos - 2, 170, 10);
+
+                const status = balance > 0.01 ? 'Gets back' : balance < -0.01 ? 'Owes' : 'Settled';
+                const color = balance > 0.01 ? [76, 175, 80] : balance < -0.01 ? [244, 67, 54] : [100, 100, 100];
+
+                doc.setTextColor(0, 0, 0);
+                doc.text(person, 25, yPos + 4);
+                doc.setTextColor(color[0], color[1], color[2]);
+                doc.text(`${status}: Rs. ${Math.abs(balance).toFixed(2)}`, 120, yPos + 4);
+                yPos += 10;
+            });
+
+            // Professional Settlements Section
+            if (yPos > 200) {
+                doc.addPage();
+                yPos = 20;
+            } else {
+                yPos += 15;
+            }
+
+            doc.setFontSize(14);
+            doc.setTextColor(76, 175, 80);
+            doc.text('SETTLEMENT TRANSACTIONS', 20, yPos);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos + 2, 110, yPos + 2);
+
+            yPos += 10;
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+
+            if (settlements.length === 0) {
+                doc.setFillColor(232, 245, 233);
+                doc.setDrawColor(76, 175, 80);
+                doc.rect(20, yPos, 170, 15, 'FD');
+                doc.setTextColor(76, 175, 80);
+                doc.text('✓ All settled! No payments needed.', 25, yPos + 8);
+                yPos += 20;
+            } else {
+                settlements.forEach((settlement, index) => {
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    // Professional table formatting
+                    if (index % 2 === 0) {
+                        doc.setFillColor(248, 248, 248);
+                        doc.rect(20, yPos - 2, 170, 12, 'F');
+                    }
+                    doc.setDrawColor(220, 220, 220);
+                    doc.rect(20, yPos - 2, 170, 12);
+
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(`${index + 1}.`, 25, yPos + 4);
+                    doc.text(`${settlement.from} pays ${settlement.to}`, 35, yPos + 4);
+                    doc.setTextColor(244, 67, 54);
+                    doc.text(`Rs. ${settlement.amount.toFixed(2)}`, 150, yPos + 4, { align: 'right' });
+                    yPos += 12;
+                });
+            }
+
+            // Professional Signature Section
+            if (yPos > 230) {
+                doc.addPage();
+                yPos = 20;
+            } else {
+                yPos += 25;
+            }
+
+            // Separator line
+            doc.setLineWidth(0.5);
+            doc.setDrawColor(200, 200, 200);
+            doc.line(20, yPos, 190, yPos);
+            yPos += 15;
+
+            // Signature area
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Report prepared by:', 20, yPos);
+            yPos += 10;
+
+            // Professional signature box
+            doc.setFillColor(248, 255, 248);
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(20, yPos, 100, 20, 'FD');
+
+            doc.setFontSize(14);
+            doc.setTextColor(76, 175, 80);
+            doc.text('Varun Sreedharan', 25, yPos + 8);
+
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Digitally signed', 25, yPos + 14);
+            doc.text(`${new Date().toLocaleDateString('en-IN')} ${new Date().toLocaleTimeString('en-IN')}`, 25, yPos + 18);
+
+            // Footer with better formatting
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+
+                // Footer line
+                doc.setLineWidth(0.3);
+                doc.setDrawColor(200, 200, 200);
+                doc.line(20, 280, 190, 280);
+
+                doc.setFontSize(8);
+                doc.setTextColor(120, 120, 120);
+                doc.text('Generated by varuns', 20, 285);
+                doc.text(`Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
+            }
+
+            // Save the PDF with better filename
+            const fileName = `Expense_Split_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+        }
+    </script>
+</body>
+</html>
