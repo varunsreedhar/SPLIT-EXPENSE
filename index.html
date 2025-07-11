@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splitwise Calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="db.js"></script>
     <style>
         * {
             margin: 0;
@@ -144,6 +145,370 @@
 
         .download-btn:hover {
             background: #F57C00;
+        }
+
+        .save-btn {
+            background: #4CAF50;
+            margin-top: 10px;
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #45a049;
+            transform: scale(1.1);
+        }
+
+        .save-icon {
+            font-size: 16px;
+        }
+
+        .save-text {
+            display: none;
+        }
+
+        .load-btn {
+            background: #2196F3;
+            margin-top: 10px;
+            min-width: 40px;
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .load-btn:hover {
+            background: #1976D2;
+            transform: scale(1.1);
+        }
+
+        .history-stats {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .history-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .history-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            background: #e8f5e8;
+            color: #4CAF50;
+        }
+
+        .status-active {
+            background: #fff3e0;
+            color: #FF9800;
+        }
+
+        .settlement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .settlement-completed {
+            background: #e8f5e8;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .settlement-text {
+            flex: 1;
+        }
+
+        .settlement-amount {
+            font-weight: bold;
+            color: #f44336;
+            margin: 0 10px;
+        }
+
+        .mark-done-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .mark-done-btn:hover {
+            background: #45a049;
+        }
+
+        .mark-done-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .undo-btn {
+            background: #FF9800;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .undo-btn:hover {
+            background: #F57C00;
+        }
+
+        .clear-history-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-history-btn:hover {
+            background: #da190b;
+            transform: translateY(-1px);
+        }
+
+        .history-header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .history-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .history-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            color: #ef6c00;
+            border: 1px solid #ff9800;
+        }
+
+        .settlement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #f9f9f9, #ffffff);
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .settlement-item:hover {
+            background: linear-gradient(135deg, #f5f5f5, #fafafa);
+            border-color: #bdbdbd;
+        }
+
+        .settlement-completed {
+            background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+            text-decoration: line-through;
+            opacity: 0.8;
+            border-color: #4caf50;
+        }
+
+        .settlement-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .settlement-amount {
+            font-weight: bold;
+            color: #f44336;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+
+        .mark-done-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mark-done-btn:hover {
+            background: linear-gradient(135deg, #45a049, #388e3c);
+            transform: translateY(-1px);
+        }
+
+        .undo-btn {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .undo-btn:hover {
+            background: linear-gradient(135deg, #F57C00, #EF6C00);
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #d32f2f, #c62828);
+            transform: translateY(-1px);
+        }
+
+        .data-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+
+
+        .auto-save-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .auto-save-indicator.show {
+            opacity: 1;
         }
 
 
@@ -464,8 +829,25 @@
                         <button class="download-btn" onclick="downloadPDF()">
                             📄 Download PDF Report
                         </button>
+                        <button class="save-btn" onclick="saveCurrentSplit()" title="Save current split to history">
+                            💾
+                        </button>
+                        <button class="load-btn" onclick="toggleHistory()" title="View split history">
+                            📋
+                        </button>
+                    </div>
+            </div>
 
+            <!-- History Section -->
+            <div id="historySection" class="section" style="display: none;">
+                <div class="history-header-section">
+                    <h2>📋 Split History</h2>
+                    <button class="clear-history-btn" onclick="clearHistory()" title="Clear all history">
+                        🗑️ Clear All
+                    </button>
                 </div>
+                <div class="history-stats" id="historyStats"></div>
+                <div id="historyList"></div>
             </div>
         </div>
     </div>
@@ -477,6 +859,10 @@
         let actionHistory = [];
         let historyIndex = -1;
         let needsRecalculation = false;
+
+        // Database configuration
+        const DB_FILE_NAME = 'splitwise-database.json';
+        let autoSaveEnabled = true;
 
         function addMember() {
             const nameInput = document.getElementById('memberName');
@@ -1133,11 +1519,231 @@
 
 
 
+        // Database integration functions
+        let lastSavedData = null; // Track last saved data to prevent duplicates
+
+        function saveCurrentSplit() {
+            if (members.length === 0 || expenses.length === 0) {
+                alert('Please add members and expenses before saving');
+                return;
+            }
+
+            // Calculate current split data
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPersonShare = totalExpenses / members.length;
+
+            // Calculate balances
+            const balances = {};
+            members.forEach(member => {
+                balances[member] = 0;
+            });
+
+            expenses.forEach(expense => {
+                const splitBetween = expense.splitBetween || members;
+                const perPersonShare = expense.amount / splitBetween.length;
+                balances[expense.paidBy] += expense.amount;
+                splitBetween.forEach(member => {
+                    if (!balances[member]) balances[member] = 0;
+                    balances[member] -= perPersonShare;
+                });
+            });
+
+            oldBalances.forEach(oldBalance => {
+                if (!balances[oldBalance.from]) balances[oldBalance.from] = 0;
+                if (!balances[oldBalance.to]) balances[oldBalance.to] = 0;
+                balances[oldBalance.from] -= oldBalance.amount;
+                balances[oldBalance.to] += oldBalance.amount;
+            });
+
+            const settlements = generateSettlements(balances);
+
+            // Create current data signature to check for duplicates
+            const currentDataSignature = JSON.stringify({
+                members: [...members].sort(),
+                expenses: [...expenses].sort((a, b) => a.id - b.id),
+                oldBalances: [...oldBalances].sort((a, b) => a.id - b.id),
+                totalExpenses
+            });
+
+            // Check if this is the same as last saved data
+            if (lastSavedData === currentDataSignature) {
+                showAutoSaveIndicator('⚠️ This split is already saved in history');
+                return;
+            }
+
+            // Save to database
+            const savedSplit = splitwiseDB.saveSplit(
+                members,
+                expenses,
+                oldBalances,
+                { totalExpenses, totalMembers: members.length, perPersonShare },
+                settlements
+            );
+
+            // Update last saved data signature
+            lastSavedData = currentDataSignature;
+
+            showAutoSaveIndicator(`💾 Split #${savedSplit.id} saved to history`);
+
+            // Update history if it's visible
+            if (document.getElementById('historySection').style.display !== 'none') {
+                displayHistory();
+            }
+        }
+
+        function toggleHistory() {
+            const historySection = document.getElementById('historySection');
+            if (historySection.style.display === 'none') {
+                historySection.style.display = 'block';
+                displayHistory();
+                // Scroll to history section
+                historySection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                historySection.style.display = 'none';
+            }
+        }
+
+        function displayHistory() {
+            const splits = splitwiseDB.getAllSplits();
+            const stats = splitwiseDB.getStatistics();
+
+            // Display statistics
+            const statsDiv = document.getElementById('historyStats');
+            statsDiv.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${stats.totalSplits}</div>
+                    <div class="stat-label">Total Splits</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${stats.completedSplits}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${stats.pendingSplits}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">₹${stats.totalAmount.toFixed(2)}</div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${stats.completedSettlements}</div>
+                    <div class="stat-label">Settlements Done</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${stats.pendingSettlements}</div>
+                    <div class="stat-label">Settlements Pending</div>
+                </div>
+            `;
+
+            // Display splits
+            const historyList = document.getElementById('historyList');
+            if (splits.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #666;">No splits saved yet. Calculate and save a split to see history.</p>';
+                return;
+            }
+
+            historyList.innerHTML = splits.map(split => `
+                <div class="history-item">
+                    <div class="history-header">
+                        <div>
+                            <div class="history-title">Split #${split.id} - ${split.date} ${split.time}</div>
+                            <div class="history-date">
+                                Members: ${split.members.join(', ')} |
+                                Total: ₹${split.calculations.totalExpenses.toFixed(2)} |
+                                Expenses: ${split.expenses.length}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="history-status ${split.status === 'completed' ? 'status-completed' : 'status-active'}">
+                                ${split.status === 'completed' ? '✅ Completed' : '⏳ Active'}
+                            </span>
+                            <button class="delete-btn" onclick="deleteSplit(${split.id})" style="margin-left: 10px; font-size: 12px;">Delete</button>
+                        </div>
+                    </div>
+                    <div class="settlements-list">
+                        ${split.settlements.length === 0 ?
+                            '<div style="text-align: center; color: #4CAF50; font-weight: bold;">🎉 All settled! No payments needed.</div>' :
+                            split.settlements.map(settlement => `
+                                <div class="settlement-item ${settlement.status === 'completed' ? 'settlement-completed' : ''}">
+                                    <div class="settlement-text">
+                                        ${settlement.from} pays ${settlement.to}
+                                    </div>
+                                    <div class="settlement-amount">₹${settlement.amount.toFixed(2)}</div>
+                                    <div>
+                                        ${settlement.status === 'completed' ?
+                                            `<button class="undo-btn" onclick="markSettlementPending(${split.id}, '${settlement.id}')">Undo</button>` :
+                                            `<button class="mark-done-btn" onclick="markSettlementDone(${split.id}, '${settlement.id}')">Mark Done</button>`
+                                        }
+                                    </div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function markSettlementDone(splitId, settlementId) {
+            if (splitwiseDB.markSettlementCompleted(splitId, settlementId)) {
+                displayHistory();
+                showAutoSaveIndicator('✅ Settlement marked as completed');
+            }
+        }
+
+        function markSettlementPending(splitId, settlementId) {
+            if (splitwiseDB.markSettlementPending(splitId, settlementId)) {
+                displayHistory();
+                showAutoSaveIndicator('↩️ Settlement marked as pending');
+            }
+        }
+
+        function deleteSplit(splitId) {
+            if (confirm('Are you sure you want to delete this split? This action cannot be undone.')) {
+                if (splitwiseDB.deleteSplit(splitId)) {
+                    displayHistory();
+                    showAutoSaveIndicator('🗑️ Split deleted');
+                }
+            }
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all split history? This action cannot be undone.')) {
+                splitwiseDB.clearAllData();
+                // Reset the last saved data tracking after clearing history
+                lastSavedData = null;
+                displayHistory();
+                showAutoSaveIndicator('🗑️ All history cleared');
+            }
+        }
+
+
+
+        function showAutoSaveIndicator(message) {
+            let indicator = document.getElementById('autoSaveIndicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'autoSaveIndicator';
+                indicator.className = 'auto-save-indicator';
+                document.body.appendChild(indicator);
+            }
+
+            indicator.textContent = message;
+            indicator.classList.add('show');
+
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
         // Recalculation highlight functions
         function markRecalculationNeeded() {
             needsRecalculation = true;
             const calculateBtn = document.getElementById('calculateBtn');
             calculateBtn.classList.add('calculate-btn-highlight');
+
+            // Reset last saved data when changes are made
+            lastSavedData = null;
         }
 
         function clearRecalculationHighlight() {
@@ -1162,7 +1768,6 @@
 
         // Initialize application on page load
         window.addEventListener('DOMContentLoaded', function() {
-            // Use default members
             updateMembersList();
             updatePaidByDropdown();
             updateOldBalanceDropdowns();
@@ -1173,6 +1778,9 @@
 
             // Add event listener for amount input to update split summary
             document.getElementById('expenseAmount').addEventListener('input', updateSplitSummary);
+
+            // Show welcome message
+            showAutoSaveIndicator('💰 Splitwise Calculator ready');
         });
 
         // Allow Enter key to add members and expenses
