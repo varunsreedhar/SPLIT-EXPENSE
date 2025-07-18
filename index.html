@@ -2,2188 +2,1156 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Splitwise Calculator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="db.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 10px;
-            margin: 0;
-        }
-
-        .container {
-            max-width: 420px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-            min-height: calc(100vh - 20px);
-        }
-
-        .header {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            padding: 20px 15px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .main-content {
-            padding: 15px;
-        }
-
-        .section {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 15px;
-            background: #fafafa;
-        }
-
-
-        .section h2 {
-            color: #333;
-            margin-bottom: 12px;
-            font-size: 1.1em;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 6px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"], input[type="number"], select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: #4CAF50;
-        }
-
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        button:hover {
-            background: #45a049;
-        }
-
-        .delete-btn {
-            background: #f44336;
-            padding: 6px 12px;
-            font-size: 12px;
-            width: auto;
-            min-width: 60px;
-        }
-
-        .delete-btn:hover {
-            background: #da190b;
-        }
-
-        .edit-btn {
-            background: #2196F3;
-            padding: 6px 12px;
-            font-size: 12px;
-            width: auto;
-            min-width: 60px;
-            margin-right: 5px;
-        }
-
-        .edit-btn:hover {
-            background: #1976D2;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 5px;
-        }
-
-        .download-btn {
-            background: #FF9800;
-            margin-top: 10px;
-        }
-
-        .download-btn:hover {
-            background: #F57C00;
-        }
-
-        .save-btn {
-            background: #4CAF50;
-            margin-top: 10px;
-            min-width: 40px;
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: all 0.3s ease;
-        }
-
-        .save-btn:hover {
-            background: #45a049;
-            transform: scale(1.1);
-        }
-
-        .save-icon {
-            font-size: 16px;
-        }
-
-        .save-text {
-            display: none;
-        }
-
-        .load-btn {
-            background: #2196F3;
-            margin-top: 10px;
-            min-width: 40px;
-            width: 40px;
-            height: 40px;
-            font-size: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: all 0.3s ease;
-        }
-
-        .load-btn:hover {
-            background: #1976D2;
-            transform: scale(1.1);
-        }
-
-        .history-stats {
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .history-item {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            padding: 15px;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .history-title {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .history-date {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .history-status {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .status-completed {
-            background: #e8f5e8;
-            color: #4CAF50;
-        }
-
-        .status-active {
-            background: #fff3e0;
-            color: #FF9800;
-        }
-
-        .settlement-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            margin: 5px 0;
-            background: #f9f9f9;
-            border-radius: 5px;
-        }
-
-        .settlement-completed {
-            background: #e8f5e8;
-            text-decoration: line-through;
-            opacity: 0.7;
-        }
-
-        .settlement-text {
-            flex: 1;
-        }
-
-        .settlement-amount {
-            font-weight: bold;
-            color: #f44336;
-            margin: 0 10px;
-        }
-
-        .mark-done-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        .mark-done-btn:hover {
-            background: #45a049;
-        }
-
-        .mark-done-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .undo-btn {
-            background: #FF9800;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        .undo-btn:hover {
-            background: #F57C00;
-        }
-
-        .clear-history-btn {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .clear-history-btn:hover {
-            background: #da190b;
-            transform: translateY(-1px);
-        }
-
-        .history-header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .history-item {
-            background: linear-gradient(135deg, #ffffff, #f8f9fa);
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .history-item:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .history-title {
-            font-weight: bold;
-            color: #333;
-            font-size: 16px;
-        }
-
-        .history-date {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .history-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-completed {
-            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-            color: #2e7d32;
-            border: 1px solid #4caf50;
-        }
-
-        .status-active {
-            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-            color: #ef6c00;
-            border: 1px solid #ff9800;
-        }
-
-        .settlement-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            margin: 8px 0;
-            background: linear-gradient(135deg, #f9f9f9, #ffffff);
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s ease;
-        }
-
-        .settlement-item:hover {
-            background: linear-gradient(135deg, #f5f5f5, #fafafa);
-            border-color: #bdbdbd;
-        }
-
-        .settlement-completed {
-            background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
-            text-decoration: line-through;
-            opacity: 0.8;
-            border-color: #4caf50;
-        }
-
-        .settlement-text {
-            flex: 1;
-            font-weight: 500;
-        }
-
-        .settlement-amount {
-            font-weight: bold;
-            color: #f44336;
-            margin: 0 15px;
-            font-size: 14px;
-        }
-
-        .mark-done-btn {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .mark-done-btn:hover {
-            background: linear-gradient(135deg, #45a049, #388e3c);
-            transform: translateY(-1px);
-        }
-
-        .undo-btn {
-            background: linear-gradient(135deg, #FF9800, #F57C00);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .undo-btn:hover {
-            background: linear-gradient(135deg, #F57C00, #EF6C00);
-            transform: translateY(-1px);
-        }
-
-        .delete-btn {
-            background: linear-gradient(135deg, #f44336, #d32f2f);
-            transition: all 0.3s ease;
-        }
-
-        .delete-btn:hover {
-            background: linear-gradient(135deg, #d32f2f, #c62828);
-            transform: translateY(-1px);
-        }
-
-        .data-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-
-
-        .auto-save-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #4CAF50;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .auto-save-indicator.show {
-            opacity: 1;
-        }
-
-
-
-        .member-item, .expense-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            margin: 8px 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .member-name {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .expense-details {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .expense-title {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .expense-info {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .results {
-            background: #e8f5e8;
-            border: 2px solid #4CAF50;
-        }
-
-        .settlement-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            margin: 8px 0;
-            background: white;
-            border-radius: 12px;
-            border-left: 4px solid #4CAF50;
-        }
-
-        .amount {
-            font-weight: bold;
-            color: #4CAF50;
-            font-size: 1.2em;
-        }
-
-        .negative-amount {
-            color: #f44336;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .summary-card {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .summary-card h3 {
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 1em;
-        }
-
-        .summary-card .value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-
-        /* Mobile-first design - no media queries needed */
-        .mobile-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .mobile-row .member-name,
-        .mobile-row .expense-details {
-            flex: 1;
-        }
-
-        .undo-redo-buttons {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .undo-btn, .redo-btn {
-            background: #9E9E9E;
-            width: auto;
-            min-width: 70px;
-            font-size: 12px;
-            padding: 6px 10px;
-        }
-
-        .undo-btn:hover, .redo-btn:hover {
-            background: #757575;
-        }
-
-        .undo-btn:disabled, .redo-btn:disabled {
-            background: #E0E0E0;
-            color: #BDBDBD;
-            cursor: not-allowed;
-        }
-
-        .split-options {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f0f8ff;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        .split-options h4 {
-            margin: 0 0 8px 0;
-            color: #333;
-            font-size: 12px;
-        }
-
-        .member-checkbox {
-            display: flex;
-            align-items: center;
-            margin: 3px 0;
-            padding: 4px;
-            background: white;
-            border-radius: 4px;
-        }
-
-        .member-checkbox input[type="checkbox"] {
-            margin-right: 6px;
-            width: auto;
-        }
-
-        .member-checkbox label {
-            font-size: 12px;
-            cursor: pointer;
-            flex: 1;
-        }
-
-        .split-summary {
-            margin-top: 8px;
-            padding: 6px;
-            background: #e8f5e8;
-            border-radius: 4px;
-            font-size: 11px;
-            color: #333;
-        }
-
-        .toggle-section {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .toggle-header {
-            padding: 10px 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fafafa;
-            border-radius: 8px 8px 0 0;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .toggle-header:hover {
-            background: #f0f0f0;
-        }
-
-        .toggle-content {
-            padding: 15px;
-            display: none;
-        }
-
-        .toggle-content.show {
-            display: block;
-        }
-
-        .toggle-arrow {
-            transition: transform 0.3s;
-            font-size: 12px;
-        }
-
-        .toggle-arrow.rotated {
-            transform: rotate(90deg);
-        }
-
-        .calculate-btn-highlight {
-            background: #FF5722 !important;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
-        }
-
-        .calculate-btn-highlight::after {
-            content: " (Recalculation needed!)";
-            font-size: 12px;
-            color: #fff;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 15px rgba(255, 87, 34, 0.5); }
-            50% { box-shadow: 0 0 25px rgba(255, 87, 34, 0.8); }
-            100% { box-shadow: 0 0 15px rgba(255, 87, 34, 0.5); }
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Passion Hills Table Tennis Club - Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>💰 Splitwise Calculator</h1>
-            <p>Easily split expenses among friends and family</p>
-        </div>
-
-        <div class="main-content">
-            <!-- Add Members Section -->
-            <div class="section">
-                <h2>👥 Add Members</h2>
-                <div class="input-group">
-                    <input type="text" id="memberName" placeholder="Enter member name" />
-                    <button onclick="addMember()">Add Member</button>
-                </div>
-                <div id="membersList"></div>
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-table-tennis"></i>
+                <h1>Passion Hills Table Tennis Club</h1>
             </div>
+            <div class="header-actions">
+                <div class="notification-icon-container" onclick="ttClub.toggleNotificationDropdown()">
+                    <i class="fas fa-bell notification-bell"></i>
+                    <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
 
-            <!-- Add Old Balances Section (Collapsible) -->
-            <div class="toggle-section">
-                <div class="toggle-header" onclick="toggleSection('oldBalancesContent')">
-                    <span>📋 Previous Balances</span>
-                    <span class="toggle-arrow" id="oldBalancesArrow">▶</span>
-                </div>
-                <div class="toggle-content" id="oldBalancesContent">
-                    <div class="input-group">
-                        <select id="oldBalanceFrom">
-                            <option value="">Who owes?</option>
-                        </select>
-                        <select id="oldBalanceTo">
-                            <option value="">To whom?</option>
-                        </select>
-                        <input type="number" id="oldBalanceAmount" placeholder="Amount owed" step="0.01" />
-                        <input type="date" id="oldBalanceDate" />
-                        <input type="text" id="oldBalanceDescription" placeholder="Description (optional)" />
-                        <button onclick="addOldBalance()">Add Previous Balance</button>
+                    <!-- Notification Dropdown -->
+                    <div id="notification-dropdown" class="notification-dropdown" style="display: none;">
+                        <div class="notification-dropdown-header">
+                            <h3>Upcoming Events</h3>
+                            <button class="btn-close-dropdown" onclick="ttClub.closeNotificationDropdown()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="notification-dropdown-content" class="notification-dropdown-content">
+                            <!-- Upcoming events will be populated here -->
+                        </div>
+                        <div class="notification-dropdown-footer">
+                            <button class="btn btn-primary btn-small" onclick="ttClub.viewAllEvents()">
+                                <i class="fas fa-calendar-alt"></i> View All Events
+                            </button>
+                        </div>
                     </div>
-                    <div id="oldBalancesList"></div>
                 </div>
-            </div>
-
-            <!-- Add Expenses Section -->
-            <div class="section">
-                <h2>💳 Add Expenses</h2>
-                <div class="undo-redo-buttons">
-                    <button class="undo-btn" id="undoBtn" onclick="undo()" disabled>↶ Undo</button>
-                    <button class="redo-btn" id="redoBtn" onclick="redo()" disabled>↷ Redo</button>
-                </div>
-                <div class="input-group">
-                    <select id="expenseCategory">
-                        <option value="">Select Category</option>
-                        <option value="food">🍽️ Food & Dining</option>
-                        <option value="water">💧 Water & Drinks</option>
-                        <option value="bottle">🍼 Bottle/Container</option>
-                        <option value="transport">🚗 Transport</option>
-                        <option value="entertainment">🎬 Entertainment</option>
-                        <option value="shopping">🛒 Shopping</option>
-                        <option value="bills">📄 Bills & Utilities</option>
-                        <option value="medical">🏥 Medical</option>
-                        <option value="other">📦 Other</option>
-                    </select>
-                    <input type="text" id="expenseDescription" placeholder="Expense description (e.g., Dinner, Movie tickets)" />
-                    <input type="number" id="expenseAmount" placeholder="Amount" step="0.01" />
-                    <select id="paidBy">
-                        <option value="">Who paid?</option>
-                    </select>
-                    <div class="split-options" id="splitOptions">
-                        <h4>👥 Who should split this expense?</h4>
-                        <div id="memberCheckboxes"></div>
-                        <div class="split-summary" id="splitSummary"></div>
-                    </div>
-                    <button onclick="addExpense()">Add Expense</button>
-                </div>
-                <div id="expensesList"></div>
-            </div>
-
-            <!-- Calculate & Results Section -->
-            <div class="section">
-                <button id="calculateBtn" onclick="calculateSplit()" style="padding: 12px; font-size: 16px; margin-bottom: 15px; font-weight: 600;">
-                    🧮 Calculate Split
+                <button class="btn btn-success btn-small" id="quick-save" title="Save Data">
+                    <i class="fas fa-save"></i>
                 </button>
-                
-                <div id="results" class="results" style="display: none;">
-                    <h2>📊 Results</h2>
-                    <div id="summary"></div>
-                    <div id="settlements"></div>
-                    <div class="data-controls">
-                        <button class="download-btn" onclick="downloadPDF()">
-                            📄 Download PDF Report
+                <nav class="nav">
+                    <button class="nav-btn active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </button>
+                    <button class="nav-btn" data-section="members">
+                        <i class="fas fa-users"></i> Members
+                    </button>
+                    <div class="nav-dropdown">
+                        <button class="nav-btn dropdown-toggle" data-section="financial">
+                            <i class="fas fa-coins"></i> Financial Management
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
                         </button>
-                        <button class="save-btn" onclick="saveCurrentSplit()" title="Save current split to history">
-                            💾
-                        </button>
-                        <button class="load-btn" onclick="toggleHistory()" title="View split history">
-                            📋
-                        </button>
-                    </div>
-            </div>
+                        <div class="nav-dropdown-menu financial-menu">
+                            <!-- Fees Section -->
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-header">
+                                    <i class="fas fa-money-bill-wave"></i> Fees
+                                </div>
+                                <button class="nav-dropdown-item" data-section="fees" data-subsection="collection">
+                                    <i class="fas fa-hand-holding-usd"></i> Fee Collection
+                                </button>
+                                <button class="nav-dropdown-item" data-section="fees" data-subsection="pending">
+                                    <i class="fas fa-clock"></i> Pending Fees
+                                </button>
+                                <button class="nav-dropdown-item" data-section="fees" data-subsection="years">
+                                    <i class="fas fa-calendar-check"></i> Fee Years
+                                </button>
+                                <button class="nav-dropdown-item" data-section="fees" data-subsection="reports">
+                                    <i class="fas fa-chart-line"></i> Fee Reports
+                                </button>
+                            </div>
 
-            <!-- History Section -->
-            <div id="historySection" class="section" style="display: none;">
-                <div class="history-header-section">
-                    <h2>📋 Split History</h2>
-                    <button class="clear-history-btn" onclick="clearHistory()" title="Clear all history">
-                        🗑️ Clear All
+                            <!-- Invoices Section -->
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-header">
+                                    <i class="fas fa-file-invoice"></i> Invoices
+                                </div>
+                                <button class="nav-dropdown-item" data-section="invoices" data-subsection="generate">
+                                    <i class="fas fa-file-plus"></i> Generate Invoice
+                                </button>
+                                <button class="nav-dropdown-item" data-section="invoices" data-subsection="manage">
+                                    <i class="fas fa-list"></i> Manage Invoices
+                                </button>
+                                <button class="nav-dropdown-item" data-section="invoices" data-subsection="templates">
+                                    <i class="fas fa-file-alt"></i> Invoice Templates
+                                </button>
+                                <button class="nav-dropdown-item" data-section="invoices" data-subsection="reports">
+                                    <i class="fas fa-chart-bar"></i> Invoice Reports
+                                </button>
+                            </div>
+
+                            <!-- Expenses Section -->
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-header">
+                                    <i class="fas fa-receipt"></i> Expenses
+                                </div>
+                                <button class="nav-dropdown-item" data-section="expenses" data-subsection="add">
+                                    <i class="fas fa-plus"></i> Add Expense
+                                </button>
+                                <button class="nav-dropdown-item" data-section="expenses" data-subsection="manage">
+                                    <i class="fas fa-list"></i> Manage Expenses
+                                </button>
+                                <button class="nav-dropdown-item" data-section="expenses" data-subsection="categories">
+                                    <i class="fas fa-tags"></i> Categories
+                                </button>
+                                <button class="nav-dropdown-item" data-section="expenses" data-subsection="reports">
+                                    <i class="fas fa-chart-line"></i> Expense Reports
+                                </button>
+                            </div>
+
+                            <!-- Contributions Section -->
+                            <div class="dropdown-section">
+                                <div class="dropdown-section-header">
+                                    <i class="fas fa-hand-holding-usd"></i> Contributions
+                                </div>
+                                <button class="nav-dropdown-item" data-section="contributions" data-subsection="add">
+                                    <i class="fas fa-plus"></i> Add Contribution
+                                </button>
+                                <button class="nav-dropdown-item" data-section="contributions" data-subsection="manage">
+                                    <i class="fas fa-list"></i> Manage Contributions
+                                </button>
+                                <button class="nav-dropdown-item" data-section="contributions" data-subsection="types">
+                                    <i class="fas fa-category"></i> Contribution Types
+                                </button>
+                                <button class="nav-dropdown-item" data-section="contributions" data-subsection="reports">
+                                    <i class="fas fa-chart-pie"></i> Contribution Reports
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="nav-btn" data-section="events">
+                        <i class="fas fa-calendar-alt"></i> Events
+                    </button>
+                    <button class="nav-btn" data-section="reports">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <h2>Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-card clickable" data-navigate="members" title="View all members">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-info">
+                            <h3 id="total-members">0</h3>
+                            <p>Total Members</p>
+                        </div>
+                        <div class="stat-card-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card clickable" data-navigate="members" data-filter="active" title="View active members">
+                        <i class="fas fa-user-check"></i>
+                        <div class="stat-info">
+                            <h3 id="active-members">0</h3>
+                            <p>Active Members</p>
+                        </div>
+                        <div class="stat-card-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card clickable" data-navigate="fees" title="View fee management">
+                        <i class="fas fa-rupee-sign"></i>
+                        <div class="stat-info">
+                            <h3 id="total-collected">₹0</h3>
+                            <p>Total Collected</p>
+                        </div>
+                        <div class="stat-card-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card clickable" data-navigate="fees" data-filter="pending" title="View pending payments">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="stat-info">
+                            <h3 id="pending-payments">0</h3>
+                            <p>Pending Payments</p>
+                        </div>
+                        <div class="stat-card-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-activities">
+                    <h3>Recent Activities</h3>
+                    <div id="recent-activities-list" class="activities-list">
+                        <!-- Activities will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Members Section -->
+            <section id="members" class="section">
+                <div class="section-header">
+                    <h2>Member Management</h2>
+                    <button class="btn btn-primary" id="add-member-btn">
+                        <i class="fas fa-plus"></i> Add New Member
                     </button>
                 </div>
-                <div class="history-stats" id="historyStats"></div>
-                <div id="historyList"></div>
+                
+                <div class="search-filter">
+                    <input type="text" id="member-search" placeholder="Search members..." class="search-input">
+                    <select id="status-filter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="FOUNDING MEMBER">Founding Member</option>
+                        <option value="NEW MEMBER">New Member</option>
+                        <option value="APPROVED FOR MEMBERSHIP">Approved</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="member-legend">
+                    <div class="legend-item">
+                        <i class="fas fa-crown" style="color: #f39c12;"></i>
+                        <span>Founding Members (highlighted rows)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="unpaid-indicator">₹0</span>
+                        <span>Unpaid fees</span>
+                    </div>
+                    <div class="legend-item">
+                        <i class="fas fa-pause-circle" style="color: #6c757d;"></i>
+                        <span>Inactive members</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="mobile-scroll-hint">← Scroll horizontally to see all columns →</div>
+                    <table class="members-table">
+                        <thead id="members-table-header">
+                            <!-- Headers will be populated by JavaScript -->
+                        </thead>
+                        <tbody id="members-table-body">
+                            <!-- Members will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Fees Section -->
+            <section id="fees" class="section">
+                <div class="section-header">
+                    <h2>Fee Management</h2>
+                    <div class="fee-subsection-nav">
+                        <button class="subsection-btn active" data-subsection="collection">
+                            <i class="fas fa-hand-holding-usd"></i> Fee Collection
+                        </button>
+                        <button class="subsection-btn" data-subsection="pending">
+                            <i class="fas fa-clock"></i> Pending Fees
+                        </button>
+                        <button class="subsection-btn" data-subsection="years">
+                            <i class="fas fa-calendar-check"></i> Fee Years
+                        </button>
+                        <button class="subsection-btn" data-subsection="reports">
+                            <i class="fas fa-chart-line"></i> Fee Reports
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fee Collection Subsection -->
+                <div id="fee-collection" class="fee-subsection active">
+                    <div class="subsection-header">
+                        <h3>Fee Collection</h3>
+                        <button class="btn btn-primary" id="collect-fee-btn">
+                            <i class="fas fa-money-bill-wave"></i> Collect Fee
+                        </button>
+                    </div>
+                    <div class="fee-summary">
+                        <div class="fee-card">
+                            <h3>Annual Fee 2023</h3>
+                            <p>Collected: <span id="fee-2023-collected">₹0</span></p>
+                            <p>Pending: <span id="fee-2023-pending">₹0</span></p>
+                        </div>
+                        <div class="fee-card">
+                            <h3>Annual Fee 2024</h3>
+                            <p>Collected: <span id="fee-2024-collected">₹0</span></p>
+                            <p>Pending: <span id="fee-2024-pending">₹0</span></p>
+                        </div>
+                        <div class="fee-card">
+                            <h3>Annual Fee 2025</h3>
+                            <p>Collected: <span id="fee-2025-collected">₹0</span></p>
+                            <p>Pending: <span id="fee-2025-pending">₹0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Fees Subsection -->
+                <div id="fee-pending" class="fee-subsection">
+                    <div class="subsection-header">
+                        <h3>Pending Fee Collections</h3>
+                        <button class="btn btn-secondary" id="add-pending-fee-btn">
+                            <i class="fas fa-plus"></i> Add Pending Fee
+                        </button>
+                    </div>
+                    <div id="pending-fees-list" class="pending-list">
+                        <p class="empty-state">No pending fees added. Click "Add Pending Fee" to create pending fee records.</p>
+                    </div>
+                </div>
+
+                <!-- Fee Years Subsection -->
+                <div id="fee-years" class="fee-subsection">
+                    <div class="subsection-header">
+                        <h3>Fee Years Management</h3>
+                        <button class="btn btn-primary" id="manage-fee-years-btn">
+                            <i class="fas fa-calendar-plus"></i> Manage Fee Years
+                        </button>
+                    </div>
+                    <div class="fee-years-content">
+                        <p>Manage fee years and amounts for different periods.</p>
+                        <!-- Fee years management content will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Fee Reports Subsection -->
+                <div id="fee-reports" class="fee-subsection">
+                    <div class="subsection-header">
+                        <h3>Fee Reports & Analytics</h3>
+                        <div class="report-actions">
+                            <button class="btn btn-success btn-small" id="export-fee-report">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                    <div class="fee-reports-content">
+                        <div class="report-summary">
+                            <div class="report-card">
+                                <h4>Total Collections</h4>
+                                <p class="report-value" id="total-collections">₹0</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Pending Amount</h4>
+                                <p class="report-value" id="total-pending">₹0</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Collection Rate</h4>
+                                <p class="report-value" id="collection-rate">0%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invoices Section -->
+            <section id="invoices" class="section">
+                <div class="section-header">
+                    <h2>Invoice Management</h2>
+                    <div class="invoice-subsection-nav">
+                        <button class="subsection-btn active" data-subsection="generate">
+                            <i class="fas fa-file-plus"></i> Generate Invoice
+                        </button>
+                        <button class="subsection-btn" data-subsection="manage">
+                            <i class="fas fa-list"></i> Manage Invoices
+                        </button>
+                        <button class="subsection-btn" data-subsection="templates">
+                            <i class="fas fa-file-alt"></i> Templates
+                        </button>
+                        <button class="subsection-btn" data-subsection="reports">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generate Invoice Subsection -->
+                <div id="invoice-generate" class="invoice-subsection active">
+                    <div class="subsection-header">
+                        <h3>Generate Invoice</h3>
+                        <button class="btn btn-primary" id="generate-invoice-btn">
+                            <i class="fas fa-file-plus"></i> Create New Invoice
+                        </button>
+                    </div>
+                    <div class="invoice-generation-content">
+                        <p>Generate invoices for members, events, or custom billing.</p>
+                        <!-- Invoice generation form will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Manage Invoices Subsection -->
+                <div id="invoice-manage" class="invoice-subsection">
+                    <div class="subsection-header">
+                        <h3>Manage Invoices</h3>
+                        <div class="invoice-actions">
+                            <button class="btn btn-secondary btn-small" id="filter-invoices">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                    <div class="invoice-list" id="invoice-list">
+                        <!-- Invoices will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Invoice Templates Subsection -->
+                <div id="invoice-templates" class="invoice-subsection">
+                    <div class="subsection-header">
+                        <h3>Invoice Templates</h3>
+                        <button class="btn btn-primary" id="create-template-btn">
+                            <i class="fas fa-plus"></i> Create Template
+                        </button>
+                    </div>
+                    <div class="templates-content">
+                        <p>Manage invoice templates for different types of billing.</p>
+                        <!-- Templates will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Invoice Reports Subsection -->
+                <div id="invoice-reports" class="invoice-subsection">
+                    <div class="subsection-header">
+                        <h3>Invoice Reports</h3>
+                        <button class="btn btn-success" id="export-invoice-report">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                    <div class="invoice-reports-content">
+                        <div class="report-summary">
+                            <div class="report-card">
+                                <h4>Total Invoices</h4>
+                                <p class="report-value" id="total-invoices">0</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Total Amount</h4>
+                                <p class="report-value" id="total-invoice-amount">₹0</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Paid Invoices</h4>
+                                <p class="report-value" id="paid-invoices">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expenses Section -->
+            <section id="expenses" class="section">
+                <div class="section-header">
+                    <h2>Expense Management</h2>
+                    <div class="expense-subsection-nav">
+                        <button class="subsection-btn active" data-subsection="add">
+                            <i class="fas fa-plus"></i> Add Expense
+                        </button>
+                        <button class="subsection-btn" data-subsection="manage">
+                            <i class="fas fa-list"></i> Manage Expenses
+                        </button>
+                        <button class="subsection-btn" data-subsection="categories">
+                            <i class="fas fa-tags"></i> Categories
+                        </button>
+                        <button class="subsection-btn" data-subsection="reports">
+                            <i class="fas fa-chart-line"></i> Reports
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Expense Subsection -->
+                <div id="expense-add" class="expense-subsection active">
+                    <div class="subsection-header">
+                        <h3>Add Expense</h3>
+                        <button class="btn btn-primary" id="add-expense-btn">
+                            <i class="fas fa-plus"></i> Create New Expense
+                        </button>
+                    </div>
+                    <div class="expense-add-content">
+                        <p>Add new expenses for club activities, equipment, and maintenance.</p>
+                        <!-- Expense form will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Manage Expenses Subsection -->
+                <div id="expense-manage" class="expense-subsection">
+                    <div class="subsection-header">
+                        <h3>Manage Expenses</h3>
+                        <div class="expense-summary">
+                            <div class="expense-card">
+                                <h4>Total Expenses</h4>
+                                <p id="total-expenses">₹0</p>
+                            </div>
+                            <div class="expense-card">
+                                <h4>This Month</h4>
+                                <p id="month-expenses">₹0</p>
+                            </div>
+                            <div class="expense-card">
+                                <h4>Pending</h4>
+                                <p id="pending-reimbursements">₹0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="expense-filters">
+                        <input type="text" id="expense-search" placeholder="Search expenses..." class="search-input">
+                        <select id="expense-category-filter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Events">Events</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <select id="expense-status-filter" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Reimbursed">Reimbursed</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="mobile-scroll-hint">← Scroll horizontally to see all columns →</div>
+                        <table class="expenses-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Paid By</th>
+                                    <th>Status</th>
+                                    <th>Receipt</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-table-body">
+                                <!-- Expenses will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Categories Subsection -->
+                <div id="expense-categories" class="expense-subsection">
+                    <div class="subsection-header">
+                        <h3>Expense Categories</h3>
+                        <button class="btn btn-primary" id="manage-categories-btn">
+                            <i class="fas fa-cog"></i> Manage Categories
+                        </button>
+                    </div>
+                    <div class="categories-content">
+                        <p>Manage expense categories for better organization and reporting.</p>
+                        <!-- Categories management will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Expense Reports Subsection -->
+                <div id="expense-reports" class="expense-subsection">
+                    <div class="subsection-header">
+                        <h3>Expense Reports</h3>
+                        <button class="btn btn-success" id="export-expense-report">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                    <div class="expense-reports-content">
+                        <div class="report-summary">
+                            <div class="report-card">
+                                <h4>Total Expenses</h4>
+                                <p class="report-value" id="report-total-expenses">₹0</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Average Monthly</h4>
+                                <p class="report-value" id="average-monthly-expense">₹0</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Top Category</h4>
+                                <p class="report-value" id="top-expense-category">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contributions Section -->
+            <section id="contributions" class="section">
+                <div class="section-header">
+                    <h2>Individual & External Contributions</h2>
+                    <div class="contribution-subsection-nav">
+                        <button class="subsection-btn active" data-subsection="add">
+                            <i class="fas fa-plus"></i> Add Contribution
+                        </button>
+                        <button class="subsection-btn" data-subsection="manage">
+                            <i class="fas fa-list"></i> Manage Contributions
+                        </button>
+                        <button class="subsection-btn" data-subsection="types">
+                            <i class="fas fa-category"></i> Types
+                        </button>
+                        <button class="subsection-btn" data-subsection="reports">
+                            <i class="fas fa-chart-pie"></i> Reports
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Contribution Subsection -->
+                <div id="contribution-add" class="contribution-subsection active">
+                    <div class="subsection-header">
+                        <h3>Add Contribution</h3>
+                        <button class="btn btn-primary" id="add-contribution-btn">
+                            <i class="fas fa-plus"></i> Create New Contribution
+                        </button>
+                    </div>
+                    <div class="contribution-add-content">
+                        <p>Record new contributions from members, external donors, or sponsors.</p>
+                        <!-- Contribution form will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Manage Contributions Subsection -->
+                <div id="contribution-manage" class="contribution-subsection">
+                    <div class="subsection-header">
+                        <h3>Manage Contributions</h3>
+                        <div class="contribution-summary">
+                            <div class="contribution-card">
+                                <h4>Total Contributions</h4>
+                                <p id="total-contributions">₹0</p>
+                            </div>
+                            <div class="contribution-card">
+                                <h4>Member Contributions</h4>
+                                <p id="member-contributions">₹0</p>
+                            </div>
+                            <div class="contribution-card">
+                                <h4>External Contributions</h4>
+                                <p id="external-contributions">₹0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contribution-filters">
+                        <input type="text" id="contribution-search" placeholder="Search contributions..." class="search-input">
+                        <select id="contribution-type-filter" class="filter-select">
+                            <option value="">All Types</option>
+                            <option value="Member">Member Contribution</option>
+                            <option value="External">External Contribution</option>
+                            <option value="Donation">Donation</option>
+                            <option value="Sponsorship">Sponsorship</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="mobile-scroll-hint">← Scroll horizontally to see all columns →</div>
+                        <table class="contributions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Contributor Name</th>
+                                    <th>Villa/Location</th>
+                                    <th>Type</th>
+                                    <th>Purpose</th>
+                                    <th>Amount</th>
+                                    <th>Receipt</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contributions-table-body">
+                                <!-- Contributions will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Contribution Types Subsection -->
+                <div id="contribution-types" class="contribution-subsection">
+                    <div class="subsection-header">
+                        <h3>Contribution Types</h3>
+                        <button class="btn btn-primary" id="manage-contribution-types-btn">
+                            <i class="fas fa-cog"></i> Manage Types
+                        </button>
+                    </div>
+                    <div class="contribution-types-content">
+                        <p>Manage different types of contributions for better categorization.</p>
+                        <!-- Contribution types management will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Contribution Reports Subsection -->
+                <div id="contribution-reports" class="contribution-subsection">
+                    <div class="subsection-header">
+                        <h3>Contribution Reports</h3>
+                        <button class="btn btn-success" id="export-contribution-report">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                    <div class="contribution-reports-content">
+                        <div class="report-summary">
+                            <div class="report-card">
+                                <h4>Total Contributions</h4>
+                                <p class="report-value" id="report-total-contributions">₹0</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Top Contributor</h4>
+                                <p class="report-value" id="top-contributor">-</p>
+                            </div>
+                            <div class="report-card">
+                                <h4>Average Amount</h4>
+                                <p class="report-value" id="average-contribution">₹0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Section -->
+            <section id="events" class="section">
+                <h2>Events & Notifications</h2>
+
+                <div class="events-header">
+                    <div class="events-actions">
+                        <button class="btn btn-primary" id="add-event-btn">
+                            <i class="fas fa-plus"></i> Add Event
+                        </button>
+                        <button class="btn btn-secondary" id="manage-notifications-btn">
+                            <i class="fas fa-bell"></i> Notification Settings
+                        </button>
+                    </div>
+                </div>
+
+                <div class="events-container">
+                    <div class="upcoming-events">
+                        <h3>Upcoming Events</h3>
+                        <div id="upcoming-events-list">
+                            <!-- Upcoming events will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="all-events">
+                        <h3>All Events</h3>
+                        <div class="events-filters">
+                            <select id="event-type-filter">
+                                <option value="">All Types</option>
+                                <option value="tournament">Tournament</option>
+                                <option value="meeting">Meeting</option>
+                                <option value="fee_reminder">Fee Reminder</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="orientation">Orientation</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <select id="event-priority-filter">
+                                <option value="">All Priorities</option>
+                                <option value="high">High Priority</option>
+                                <option value="medium">Medium Priority</option>
+                                <option value="low">Low Priority</option>
+                            </select>
+                        </div>
+                        <div id="all-events-list">
+                            <!-- All events will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="section">
+                <h2>Reports & Analytics</h2>
+                <div class="report-cards">
+                    <div class="report-card">
+                        <h3>Financial Summary</h3>
+                        <div id="financial-summary">
+                            <!-- Financial data will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <h3>Member Statistics</h3>
+                        <div id="member-statistics">
+                            <!-- Member stats will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="export-options">
+                    <button class="btn btn-secondary" id="export-members">
+                        <i class="fas fa-download"></i> Export Members
+                    </button>
+                    <button class="btn btn-secondary" id="export-financial">
+                        <i class="fas fa-download"></i> Export Financial Data
+                    </button>
+                    <button class="btn btn-primary" id="backup-data">
+                        <i class="fas fa-save"></i> Backup Database
+                    </button>
+                    <button class="btn btn-success" id="download-json">
+                        <i class="fas fa-file-download"></i> Download JSON
+                    </button>
+                    <button class="btn btn-warning" id="import-json">
+                        <i class="fas fa-file-upload"></i> Import JSON
+                    </button>
+                    <button class="btn btn-danger" id="reset-data" title="Reset to original database">
+                        <i class="fas fa-refresh"></i> Reset to Original
+                    </button>
+                    <input type="file" id="json-file-input" accept=".json" style="display: none;">
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title">Add New Member</h2>
+            <form id="member-form">
+                <div class="form-group">
+                    <label for="member-name">Name:</label>
+                    <input type="text" id="member-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="member-villa">Villa No:</label>
+                    <input type="text" id="member-villa" required>
+                </div>
+                <div class="form-group">
+                    <label for="member-status">Status:</label>
+                    <select id="member-status" required>
+                        <option value="">Select Status</option>
+                        <option value="FOUNDING MEMBER">Founding Member</option>
+                        <option value="NEW MEMBER">New Member</option>
+                        <option value="APPROVED FOR MEMBERSHIP">Approved for Membership</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="membership-fee">Initial Membership Fee:</label>
+                    <input type="number" id="membership-fee" value="3000">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-member">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="fee-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Collect Fee</h2>
+            <form id="fee-form">
+                <div class="form-group">
+                    <label for="fee-member">Select Member:</label>
+                    <select id="fee-member" required>
+                        <option value="">Select Member</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fee-type">Fee Type:</label>
+                    <select id="fee-type" required>
+                        <option value="">Select Fee Type</option>
+                        <option value="annual_2023">Annual Fee 2023</option>
+                        <option value="annual_2024">Annual Fee 2024</option>
+                        <option value="annual_2025">Annual Fee 2025</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fee-amount">Amount:</label>
+                    <input type="number" id="fee-amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="payment-date">Payment Date:</label>
+                    <input type="date" id="payment-date" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-fee">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Collect Fee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div id="expense-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="expense-modal-title">Add New Expense</h2>
+            <form id="expense-form">
+                <div class="form-group">
+                    <label for="expense-date">Date:</label>
+                    <input type="date" id="expense-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="expense-description">Description:</label>
+                    <input type="text" id="expense-description" placeholder="e.g., Table tennis balls, Net repair" required>
+                </div>
+                <div class="form-group">
+                    <label for="expense-category">Category:</label>
+                    <select id="expense-category" required>
+                        <option value="">Select Category</option>
+                        <option value="Equipment">Equipment</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Events">Events</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="expense-amount">Amount (₹):</label>
+                    <input type="number" id="expense-amount" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="expense-paid-by">Paid By:</label>
+                    <input type="text" id="expense-paid-by" placeholder="Name of person who paid" required>
+                </div>
+                <div class="form-group">
+                    <label for="expense-status">Status:</label>
+                    <select id="expense-status" required>
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Reimbursed">Reimbursed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="expense-receipt">Receipt/Notes:</label>
+                    <textarea id="expense-receipt" placeholder="Receipt details or additional notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-expense">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contribution Modal -->
+    <div id="contribution-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="contribution-modal-title">Add New Contribution</h2>
+            <form id="contribution-form">
+                <div class="form-group">
+                    <label for="contribution-date">Date:</label>
+                    <input type="date" id="contribution-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="contribution-name">Contributor Name:</label>
+                    <input type="text" id="contribution-name" placeholder="Full name of contributor" required>
+                </div>
+                <div class="form-group">
+                    <label for="contribution-location">Villa/Location:</label>
+                    <input type="text" id="contribution-location" placeholder="Villa number or location" required>
+                </div>
+                <div class="form-group">
+                    <label for="contribution-type">Type:</label>
+                    <select id="contribution-type" required>
+                        <option value="">Select Type</option>
+                        <option value="Member">Member Contribution</option>
+                        <option value="External">External Contribution</option>
+                        <option value="Donation">Donation</option>
+                        <option value="Sponsorship">Sponsorship</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contribution-purpose">Purpose:</label>
+                    <input type="text" id="contribution-purpose" placeholder="e.g., Equipment fund, Tournament sponsorship" required>
+                </div>
+                <div class="form-group">
+                    <label for="contribution-amount">Amount (₹):</label>
+                    <input type="number" id="contribution-amount" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="contribution-receipt">Receipt/Notes:</label>
+                    <textarea id="contribution-receipt" placeholder="Receipt details or additional notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-contribution">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Contribution</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pending Fee Modal -->
+    <div id="pending-fee-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Pending Fee</h2>
+            <form id="pending-fee-form">
+                <div class="form-group">
+                    <label for="pending-fee-member">Member:</label>
+                    <select id="pending-fee-member" required>
+                        <option value="">Select Member</option>
+                        <!-- Members will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pending-fee-type">Fee Type:</label>
+                    <select id="pending-fee-type" required>
+                        <!-- Fee types will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pending-fee-amount">Amount (₹):</label>
+                    <input type="number" id="pending-fee-amount" min="0" step="1" value="500" required>
+                </div>
+                <div class="form-group">
+                    <label for="pending-fee-due-date">Due Date:</label>
+                    <input type="date" id="pending-fee-due-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="pending-fee-notes">Notes (Optional):</label>
+                    <textarea id="pending-fee-notes" placeholder="Additional notes about this pending fee" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-pending-fee">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Pending Fee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fee Years Management Modal -->
+    <div id="fee-years-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Manage Fee Years</h2>
+
+            <div class="current-years-section">
+                <h3>Current Fee Years</h3>
+                <div id="current-fee-years" class="fee-years-list">
+                    <!-- Current years will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="add-year-section">
+                <h3>Add New Fee Year</h3>
+                <form id="add-fee-year-form">
+                    <div class="form-group">
+                        <label for="new-fee-year">Year:</label>
+                        <input type="number" id="new-fee-year" min="2023" max="2050" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-fee-amount">Default Annual Fee Amount (₹):</label>
+                        <input type="number" id="new-fee-amount" min="0" step="1" value="500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fee-year-description">Description (Optional):</label>
+                        <input type="text" id="fee-year-description" placeholder="e.g., Regular annual fee, Special assessment">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-fee-year">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Fee Year</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <script>
-        let members = ['Varun Sreedharan', 'Riju Abraham', 'Praveen P'];
-        let expenses = [];
-        let oldBalances = [];
-        let actionHistory = [];
-        let historyIndex = -1;
-        let needsRecalculation = false;
+    <!-- Edit Member Fee Modal -->
+    <div id="edit-member-fee-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Member Fee</h2>
+            <form id="edit-member-fee-form">
+                <div class="member-fee-info">
+                    <p><strong>Member:</strong> <span id="edit-fee-member-name"></span></p>
+                    <p><strong>Fee Year:</strong> <span id="edit-fee-year"></span></p>
+                    <p><strong>Current Amount:</strong> ₹<span id="edit-fee-current-amount"></span></p>
+                </div>
 
-        // Database configuration
-        const DB_FILE_NAME = 'splitwise-database.json';
-        let autoSaveEnabled = true;
+                <div class="form-group">
+                    <label for="edit-fee-new-amount">New Amount (₹):</label>
+                    <input type="number" id="edit-fee-new-amount" min="0" step="1" required>
+                </div>
 
-        function addMember() {
-            const nameInput = document.getElementById('memberName');
-            const name = nameInput.value.trim();
+                <div class="form-group">
+                    <label for="edit-fee-reason">Reason for Change:</label>
+                    <select id="edit-fee-reason" required>
+                        <option value="">Select Reason</option>
+                        <option value="Data Entry Error">Data Entry Error</option>
+                        <option value="Partial Payment Correction">Partial Payment Correction</option>
+                        <option value="Refund Applied">Refund Applied</option>
+                        <option value="Late Fee Added">Late Fee Added</option>
+                        <option value="Discount Applied">Discount Applied</option>
+                        <option value="Administrative Adjustment">Administrative Adjustment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
 
-            if (name === '') {
-                alert('Please enter a member name');
-                return;
-            }
+                <div class="form-group">
+                    <label for="edit-fee-notes">Additional Notes (Optional):</label>
+                    <textarea id="edit-fee-notes" placeholder="Explain the reason for this fee adjustment" rows="3"></textarea>
+                </div>
 
-            if (members.includes(name)) {
-                alert('Member already exists');
-                return;
-            }
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit-fee">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Fee</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            saveState('add_member');
-            members.push(name);
-            nameInput.value = '';
-            markRecalculationNeeded();
-            updateMembersList();
-            updatePaidByDropdown();
-            updateOldBalanceDropdowns();
-            updateMemberCheckboxes();
-        }
+    <!-- Event Modal -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="event-modal-title">Add Event</h2>
+            <form id="event-form">
+                <div class="form-group">
+                    <label for="event-title">Event Title:</label>
+                    <input type="text" id="event-title" required placeholder="Enter event title">
+                </div>
 
-        function removeMember(name) {
-            saveState('remove_member');
-            members = members.filter(member => member !== name);
-            expenses = expenses.filter(expense => expense.paidBy !== name);
-            oldBalances = oldBalances.filter(balance => balance.from !== name && balance.to !== name);
-            markRecalculationNeeded();
-            updateMembersList();
-            updatePaidByDropdown();
-            updateOldBalanceDropdowns();
-            updateMemberCheckboxes();
-            updateExpensesList();
-            updateOldBalancesList();
-        }
+                <div class="form-group">
+                    <label for="event-description">Description:</label>
+                    <textarea id="event-description" rows="3" placeholder="Enter event description"></textarea>
+                </div>
 
-        function updateMembersList() {
-            const membersList = document.getElementById('membersList');
-            membersList.innerHTML = '';
-
-            members.forEach(member => {
-                const memberDiv = document.createElement('div');
-                memberDiv.className = 'member-item';
-                memberDiv.innerHTML = `
-                    <span class="member-name">${member}</span>
-                    <button class="delete-btn" onclick="removeMember('${member}')">Remove</button>
-                `;
-                membersList.appendChild(memberDiv);
-            });
-        }
-
-        function updatePaidByDropdown() {
-            const paidBySelect = document.getElementById('paidBy');
-            paidBySelect.innerHTML = '<option value="">Who paid?</option>';
-
-            members.forEach(member => {
-                const option = document.createElement('option');
-                option.value = member;
-                option.textContent = member;
-                paidBySelect.appendChild(option);
-            });
-        }
-
-        function updateMemberCheckboxes() {
-            const checkboxContainer = document.getElementById('memberCheckboxes');
-            checkboxContainer.innerHTML = '';
-
-            members.forEach(member => {
-                const checkboxDiv = document.createElement('div');
-                checkboxDiv.className = 'member-checkbox';
-                checkboxDiv.innerHTML = `
-                    <input type="checkbox" id="split_${member}" value="${member}" checked onchange="updateSplitSummary()">
-                    <label for="split_${member}">${member}</label>
-                `;
-                checkboxContainer.appendChild(checkboxDiv);
-            });
-
-            updateSplitSummary();
-        }
-
-        function updateSplitSummary() {
-            const checkboxes = document.querySelectorAll('#memberCheckboxes input[type="checkbox"]:checked');
-            const selectedMembers = Array.from(checkboxes).map(cb => cb.value);
-            const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
-            const perPersonAmount = selectedMembers.length > 0 ? amount / selectedMembers.length : 0;
-
-            const summaryDiv = document.getElementById('splitSummary');
-            if (selectedMembers.length === 0) {
-                summaryDiv.innerHTML = '⚠️ Please select at least one person to split this expense';
-                summaryDiv.style.background = '#ffebee';
-                summaryDiv.style.color = '#c62828';
-            } else {
-                summaryDiv.innerHTML = `💰 ${selectedMembers.length} people selected • ₹${perPersonAmount.toFixed(2)} per person`;
-                summaryDiv.style.background = '#e8f5e8';
-                summaryDiv.style.color = '#333';
-            }
-        }
-
-        function updateOldBalanceDropdowns() {
-            const fromSelect = document.getElementById('oldBalanceFrom');
-            const toSelect = document.getElementById('oldBalanceTo');
-
-            fromSelect.innerHTML = '<option value="">Who owes?</option>';
-            toSelect.innerHTML = '<option value="">To whom?</option>';
-
-            members.forEach(member => {
-                const fromOption = document.createElement('option');
-                fromOption.value = member;
-                fromOption.textContent = member;
-                fromSelect.appendChild(fromOption);
-
-                const toOption = document.createElement('option');
-                toOption.value = member;
-                toOption.textContent = member;
-                toSelect.appendChild(toOption);
-            });
-        }
-
-        function addExpense() {
-            const category = document.getElementById('expenseCategory').value;
-            const description = document.getElementById('expenseDescription').value.trim();
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            const paidBy = document.getElementById('paidBy').value;
-
-            // Get selected members for splitting
-            const checkboxes = document.querySelectorAll('#memberCheckboxes input[type="checkbox"]:checked');
-            const splitBetween = Array.from(checkboxes).map(cb => cb.value);
-
-            if (category === '' || description === '' || isNaN(amount) || amount <= 0 || paidBy === '') {
-                alert('Please fill all expense fields correctly including category');
-                return;
-            }
-
-            if (splitBetween.length === 0) {
-                alert('Please select at least one person to split this expense');
-                return;
-            }
-
-            // Save current state for undo
-            saveState('add_expense');
-
-            const expense = {
-                id: Date.now(),
-                category,
-                description,
-                amount,
-                paidBy,
-                splitBetween: [...splitBetween] // Array of members who should split this expense
-            };
-
-            expenses.push(expense);
-
-            // Clear inputs
-            document.getElementById('expenseCategory').value = '';
-            document.getElementById('expenseDescription').value = '';
-            document.getElementById('expenseAmount').value = '';
-            document.getElementById('paidBy').value = '';
-
-            // Reset checkboxes to all selected
-            updateMemberCheckboxes();
-
-            // Mark that recalculation is needed
-            markRecalculationNeeded();
-
-            updateExpensesList();
-        }
-
-        function removeExpense(id) {
-            saveState('remove_expense');
-            expenses = expenses.filter(expense => expense.id !== id);
-            markRecalculationNeeded();
-            updateExpensesList();
-        }
-
-        function editExpense(id) {
-            const expense = expenses.find(exp => exp.id === id);
-            if (!expense) return;
-
-            // Fill the form with existing expense data
-            document.getElementById('expenseCategory').value = expense.category || '';
-            document.getElementById('expenseDescription').value = expense.description;
-            document.getElementById('expenseAmount').value = expense.amount;
-            document.getElementById('paidBy').value = expense.paidBy;
-
-            // Set the split checkboxes based on the expense
-            if (expense.splitBetween) {
-                // Uncheck all first
-                document.querySelectorAll('#memberCheckboxes input[type="checkbox"]').forEach(cb => {
-                    cb.checked = expense.splitBetween.includes(cb.value);
-                });
-            }
-            updateSplitSummary();
-
-            // Remove the expense from the list (it will be re-added when user clicks "Add Expense")
-            removeExpense(id);
-
-            // Mark that recalculation is needed (already done in removeExpense, but emphasize for editing)
-            markRecalculationNeeded();
-
-            // Scroll to the expense form
-            document.getElementById('expenseCategory').scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('expenseCategory').focus();
-
-            // Show a temporary message
-            showEditMessage();
-        }
-
-        function showEditMessage() {
-            const existingMessage = document.getElementById('editMessage');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-
-            const message = document.createElement('div');
-            message.id = 'editMessage';
-            message.style.cssText = `
-                background: #2196F3;
-                color: white;
-                padding: 10px;
-                border-radius: 8px;
-                margin-bottom: 10px;
-                text-align: center;
-                font-size: 14px;
-            `;
-            message.textContent = '✏️ Expense loaded for editing. Modify the details and click "Add Expense" to save changes.';
-
-            const expenseSection = document.querySelector('.section:nth-child(3)');
-            expenseSection.insertBefore(message, expenseSection.children[1]);
-
-            // Remove message after 5 seconds
-            setTimeout(() => {
-                if (document.getElementById('editMessage')) {
-                    document.getElementById('editMessage').remove();
-                }
-            }, 5000);
-        }
-
-        function updateExpensesList() {
-            const expensesList = document.getElementById('expensesList');
-            expensesList.innerHTML = '';
-
-            expenses.forEach(expense => {
-                const expenseDiv = document.createElement('div');
-                expenseDiv.className = 'expense-item';
-                const splitInfo = expense.splitBetween ?
-                    `Split between: ${expense.splitBetween.join(', ')} (₹${(expense.amount / expense.splitBetween.length).toFixed(2)} each)` :
-                    `Split equally among all members`;
-
-                // Get category display
-                const categoryDisplay = getCategoryDisplay(expense.category);
-
-                expenseDiv.innerHTML = `
-                    <div class="expense-details">
-                        <div class="expense-title">${categoryDisplay} ${expense.description}</div>
-                        <div class="expense-info">Paid by ${expense.paidBy} • ₹${expense.amount.toFixed(2)}</div>
-                        <div class="expense-info" style="font-size: 12px; color: #666;">${splitInfo}</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-date">Date:</label>
+                        <input type="date" id="event-date" required>
                     </div>
-                    <div class="button-group">
-                        <button class="edit-btn" onclick="editExpense(${expense.id})">Edit</button>
-                        <button class="delete-btn" onclick="removeExpense(${expense.id})">Remove</button>
-                    </div>
-                `;
-                expensesList.appendChild(expenseDiv);
-            });
-        }
-
-        function getCategoryDisplay(category) {
-            const categories = {
-                'food': '🍽️',
-                'water': '💧',
-                'bottle': '🍼',
-                'transport': '🚗',
-                'entertainment': '🎬',
-                'shopping': '🛒',
-                'bills': '📄',
-                'medical': '🏥',
-                'other': '📦'
-            };
-            return categories[category] || '📦';
-        }
-
-        function getCategoryName(category) {
-            const categoryNames = {
-                'food': 'FOOD',
-                'water': 'WATER',
-                'bottle': 'BOTTLE',
-                'transport': 'TRANSPORT',
-                'entertainment': 'ENTERTAINMENT',
-                'shopping': 'SHOPPING',
-                'bills': 'BILLS',
-                'medical': 'MEDICAL',
-                'other': 'OTHER'
-            };
-            return categoryNames[category] || 'OTHER';
-        }
-
-        function calculateSplit() {
-            if (members.length === 0) {
-                alert('Please add at least one member');
-                return;
-            }
-
-            if (expenses.length === 0 && oldBalances.length === 0) {
-                alert('Please add at least one expense or old balance');
-                return;
-            }
-
-            // Calculate total expenses
-            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
-            // Initialize balances for all members
-            const balances = {};
-            members.forEach(member => {
-                balances[member] = 0;
-            });
-
-            // Process each expense with correct advanced splitting logic
-            expenses.forEach(expense => {
-                const splitBetween = expense.splitBetween || members; // Default to all members if not specified
-                const perPersonShare = expense.amount / splitBetween.length;
-
-                // Person who paid gets credited with the full amount
-                balances[expense.paidBy] += expense.amount;
-
-                // Only people who should split this expense get debited their share
-                splitBetween.forEach(member => {
-                    if (!balances[member]) balances[member] = 0;
-                    balances[member] -= perPersonShare;
-                });
-            });
-
-            // Add old balances to the calculation
-            oldBalances.forEach(oldBalance => {
-                if (!balances[oldBalance.from]) balances[oldBalance.from] = 0;
-                if (!balances[oldBalance.to]) balances[oldBalance.to] = 0;
-
-                balances[oldBalance.from] -= oldBalance.amount; // Person who owes money
-                balances[oldBalance.to] += oldBalance.amount;   // Person who is owed money
-            });
-
-            // Calculate average per person for display - this is just for display purposes
-            // It shows what each person would pay if all expenses were split equally among everyone
-            const perPersonShare = totalExpenses / members.length;
-
-            // Generate settlements
-            const settlements = generateSettlements(balances);
-
-            // Clear the recalculation highlight
-            clearRecalculationHighlight();
-
-            displayResults(totalExpenses, perPersonShare, balances, settlements);
-        }
-
-        function generateSettlements(balances) {
-            const settlements = [];
-            const creditors = []; // People who are owed money
-            const debtors = []; // People who owe money
-            
-            Object.entries(balances).forEach(([person, balance]) => {
-                if (balance > 0.01) {
-                    creditors.push({ person, amount: balance });
-                } else if (balance < -0.01) {
-                    debtors.push({ person, amount: -balance });
-                }
-            });
-            
-            // Sort by amount for optimal settlements
-            creditors.sort((a, b) => b.amount - a.amount);
-            debtors.sort((a, b) => b.amount - a.amount);
-            
-            let i = 0, j = 0;
-            while (i < creditors.length && j < debtors.length) {
-                const creditor = creditors[i];
-                const debtor = debtors[j];
-                
-                const settleAmount = Math.min(creditor.amount, debtor.amount);
-                
-                settlements.push({
-                    from: debtor.person,
-                    to: creditor.person,
-                    amount: settleAmount
-                });
-                
-                creditor.amount -= settleAmount;
-                debtor.amount -= settleAmount;
-                
-                if (creditor.amount < 0.01) i++;
-                if (debtor.amount < 0.01) j++;
-            }
-            
-            return settlements;
-        }
-
-        function displayResults(totalExpenses, perPersonShare, balances, settlements) {
-            const resultsDiv = document.getElementById('results');
-            const summaryDiv = document.getElementById('summary');
-            const settlementsDiv = document.getElementById('settlements');
-            
-            // Summary
-            summaryDiv.innerHTML = `
-                <div class="summary-grid">
-                    <div class="summary-card">
-                        <h3>Total Expenses</h3>
-                        <div class="value">₹${totalExpenses.toFixed(2)}</div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>Per Person Share</h3>
-                        <div class="value">₹${perPersonShare.toFixed(2)}</div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>Total Members</h3>
-                        <div class="value">${members.length}</div>
+                    <div class="form-group">
+                        <label for="event-time">Time:</label>
+                        <input type="time" id="event-time" required>
                     </div>
                 </div>
-                
-                <h3 style="margin: 20px 0 10px 0;">Individual Balances:</h3>
-            `;
-            
-            Object.entries(balances).forEach(([person, balance]) => {
-                const balanceDiv = document.createElement('div');
-                balanceDiv.className = 'settlement-item';
-                const isPositive = balance > 0.01;
-                const isNegative = balance < -0.01;
-                
-                balanceDiv.innerHTML = `
-                    <span>${person}</span>
-                    <span class="amount ${isNegative ? 'negative-amount' : ''}">
-                        ${isPositive ? 'Gets back: ' : isNegative ? 'Owes: ' : 'Settled: '}
-                        ₹${Math.abs(balance).toFixed(2)}
-                    </span>
-                `;
-                summaryDiv.appendChild(balanceDiv);
-            });
-            
-            // Settlements
-            settlementsDiv.innerHTML = '<h3 style="margin: 20px 0 10px 0;">💸 Settlements Required:</h3>';
-            
-            if (settlements.length === 0) {
-                settlementsDiv.innerHTML += '<p style="text-align: center; color: #4CAF50; font-size: 18px;">🎉 All settled! No payments needed.</p>';
-            } else {
-                settlements.forEach(settlement => {
-                    const settlementDiv = document.createElement('div');
-                    settlementDiv.className = 'settlement-item';
-                    settlementDiv.innerHTML = `
-                        <span><strong>${settlement.from}</strong> pays <strong>${settlement.to}</strong></span>
-                        <span class="amount">₹${settlement.amount.toFixed(2)}</span>
-                    `;
-                    settlementsDiv.appendChild(settlementDiv);
-                });
-            }
-            
-            resultsDiv.style.display = 'block';
-        }
 
-        function addOldBalance() {
-            const from = document.getElementById('oldBalanceFrom').value;
-            const to = document.getElementById('oldBalanceTo').value;
-            const amount = parseFloat(document.getElementById('oldBalanceAmount').value);
-            const date = document.getElementById('oldBalanceDate').value;
-            const description = document.getElementById('oldBalanceDescription').value.trim();
-
-            if (from === '' || to === '' || isNaN(amount) || amount <= 0 || date === '') {
-                alert('Please fill all required old balance fields correctly');
-                return;
-            }
-
-            if (from === to) {
-                alert('A person cannot owe money to themselves');
-                return;
-            }
-
-            const oldBalance = {
-                id: Date.now(),
-                from,
-                to,
-                amount,
-                date,
-                description: description || 'Previous balance'
-            };
-
-            oldBalances.push(oldBalance);
-
-            // Clear inputs
-            document.getElementById('oldBalanceFrom').value = '';
-            document.getElementById('oldBalanceTo').value = '';
-            document.getElementById('oldBalanceAmount').value = '';
-            document.getElementById('oldBalanceDate').value = '';
-            document.getElementById('oldBalanceDescription').value = '';
-
-            // Mark that recalculation is needed
-            markRecalculationNeeded();
-
-            updateOldBalancesList();
-        }
-
-        function removeOldBalance(id) {
-            oldBalances = oldBalances.filter(balance => balance.id !== id);
-            markRecalculationNeeded();
-            updateOldBalancesList();
-        }
-
-        function updateOldBalancesList() {
-            const oldBalancesList = document.getElementById('oldBalancesList');
-            oldBalancesList.innerHTML = '';
-
-            oldBalances.forEach(balance => {
-                const balanceDiv = document.createElement('div');
-                balanceDiv.className = 'expense-item';
-                balanceDiv.innerHTML = `
-                    <div class="expense-details">
-                        <div class="expense-title">${balance.description}</div>
-                        <div class="expense-info">${balance.from} owes ${balance.to} • ₹${balance.amount.toFixed(2)} • ${new Date(balance.date).toLocaleDateString('en-IN')}</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="event-type">Type:</label>
+                        <select id="event-type" required>
+                            <option value="">Select Type</option>
+                            <option value="tournament">Tournament</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="fee_reminder">Fee Reminder</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="orientation">Orientation</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
-                    <div class="button-group">
-                        <button class="edit-btn" onclick="editOldBalance(${balance.id})">Edit</button>
-                        <button class="delete-btn" onclick="removeOldBalance(${balance.id})">Remove</button>
-                    </div>
-                `;
-                oldBalancesList.appendChild(balanceDiv);
-            });
-        }
-
-        function editOldBalance(id) {
-            const balance = oldBalances.find(bal => bal.id === id);
-            if (!balance) return;
-
-            // Fill the form with existing balance data
-            document.getElementById('oldBalanceFrom').value = balance.from;
-            document.getElementById('oldBalanceTo').value = balance.to;
-            document.getElementById('oldBalanceAmount').value = balance.amount;
-            document.getElementById('oldBalanceDate').value = balance.date;
-            document.getElementById('oldBalanceDescription').value = balance.description;
-
-            // Remove the balance from the list (it will be re-added when user clicks "Add Old Balance")
-            removeOldBalance(id);
-
-            // Scroll to the old balance form
-            document.getElementById('oldBalanceFrom').scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('oldBalanceFrom').focus();
-
-            // Show a temporary message
-            showOldBalanceEditMessage();
-        }
-
-        function showOldBalanceEditMessage() {
-            const existingMessage = document.getElementById('oldBalanceEditMessage');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-
-            const message = document.createElement('div');
-            message.id = 'oldBalanceEditMessage';
-            message.style.cssText = `
-                background: #2196F3;
-                color: white;
-                padding: 10px;
-                border-radius: 8px;
-                margin-bottom: 10px;
-                text-align: center;
-                font-size: 14px;
-            `;
-            message.textContent = '✏️ Old balance loaded for editing. Modify the details and click "Add Old Balance" to save changes.';
-
-            const oldBalanceSection = document.querySelector('.section:nth-child(2)');
-            oldBalanceSection.insertBefore(message, oldBalanceSection.children[1]);
-
-            // Remove message after 5 seconds
-            setTimeout(() => {
-                if (document.getElementById('oldBalanceEditMessage')) {
-                    document.getElementById('oldBalanceEditMessage').remove();
-                }
-            }, 5000);
-        }
-
-        // Undo/Redo functionality
-        function saveState(action) {
-            // Remove any future history if we're not at the end
-            if (historyIndex < actionHistory.length - 1) {
-                actionHistory = actionHistory.slice(0, historyIndex + 1);
-            }
-
-            // Save current state
-            const state = {
-                action,
-                timestamp: Date.now(),
-                members: [...members],
-                expenses: JSON.parse(JSON.stringify(expenses)),
-                oldBalances: JSON.parse(JSON.stringify(oldBalances))
-            };
-
-            actionHistory.push(state);
-            historyIndex++;
-
-            // Limit history to 20 actions
-            if (actionHistory.length > 20) {
-                actionHistory.shift();
-                historyIndex--;
-            }
-
-            updateUndoRedoButtons();
-        }
-
-        function undo() {
-            if (historyIndex >= 0) {
-                const state = actionHistory[historyIndex];
-                members = [...state.members];
-                expenses = JSON.parse(JSON.stringify(state.expenses));
-                oldBalances = JSON.parse(JSON.stringify(state.oldBalances));
-
-                historyIndex--;
-                updateAllDisplays();
-                updateUndoRedoButtons();
-            }
-        }
-
-        function redo() {
-            if (historyIndex < actionHistory.length - 1) {
-                historyIndex++;
-                const state = actionHistory[historyIndex];
-                members = [...state.members];
-                expenses = JSON.parse(JSON.stringify(state.expenses));
-                oldBalances = JSON.parse(JSON.stringify(state.oldBalances));
-
-                updateAllDisplays();
-                updateUndoRedoButtons();
-            }
-        }
-
-        function updateUndoRedoButtons() {
-            const undoBtn = document.getElementById('undoBtn');
-            const redoBtn = document.getElementById('redoBtn');
-
-            undoBtn.disabled = historyIndex < 0;
-            redoBtn.disabled = historyIndex >= actionHistory.length - 1;
-        }
-
-        function updateAllDisplays() {
-            updateMembersList();
-            updatePaidByDropdown();
-            updateOldBalanceDropdowns();
-            updateMemberCheckboxes();
-            updateExpensesList();
-            updateOldBalancesList();
-        }
-
-
-
-
-
-
-
-
-
-        // Database integration functions
-        let lastSavedData = null; // Track last saved data to prevent duplicates
-
-        function saveCurrentSplit() {
-            if (members.length === 0 || expenses.length === 0) {
-                alert('Please add members and expenses before saving');
-                return;
-            }
-
-            // Calculate current split data
-            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const perPersonShare = totalExpenses / members.length;
-
-            // Calculate balances
-            const balances = {};
-            members.forEach(member => {
-                balances[member] = 0;
-            });
-
-            expenses.forEach(expense => {
-                const splitBetween = expense.splitBetween || members;
-                const perPersonShare = expense.amount / splitBetween.length;
-                balances[expense.paidBy] += expense.amount;
-                splitBetween.forEach(member => {
-                    if (!balances[member]) balances[member] = 0;
-                    balances[member] -= perPersonShare;
-                });
-            });
-
-            oldBalances.forEach(oldBalance => {
-                if (!balances[oldBalance.from]) balances[oldBalance.from] = 0;
-                if (!balances[oldBalance.to]) balances[oldBalance.to] = 0;
-                balances[oldBalance.from] -= oldBalance.amount;
-                balances[oldBalance.to] += oldBalance.amount;
-            });
-
-            const settlements = generateSettlements(balances);
-
-            // Create current data signature to check for duplicates
-            const currentDataSignature = JSON.stringify({
-                members: [...members].sort(),
-                expenses: [...expenses].sort((a, b) => a.id - b.id),
-                oldBalances: [...oldBalances].sort((a, b) => a.id - b.id),
-                totalExpenses
-            });
-
-            // Check if this is the same as last saved data
-            if (lastSavedData === currentDataSignature) {
-                showAutoSaveIndicator('⚠️ This split is already saved in history');
-                return;
-            }
-
-            // Save to database
-            const savedSplit = splitwiseDB.saveSplit(
-                members,
-                expenses,
-                oldBalances,
-                { totalExpenses, totalMembers: members.length, perPersonShare },
-                settlements
-            );
-
-            // Update last saved data signature
-            lastSavedData = currentDataSignature;
-
-            showAutoSaveIndicator(`💾 Split #${savedSplit.id} saved to history`);
-
-            // Update history if it's visible
-            if (document.getElementById('historySection').style.display !== 'none') {
-                displayHistory();
-            }
-        }
-
-        function toggleHistory() {
-            const historySection = document.getElementById('historySection');
-            if (historySection.style.display === 'none') {
-                historySection.style.display = 'block';
-                displayHistory();
-                // Scroll to history section
-                historySection.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                historySection.style.display = 'none';
-            }
-        }
-
-        function displayHistory() {
-            const splits = splitwiseDB.getAllSplits();
-            const stats = splitwiseDB.getStatistics();
-
-            // Display statistics
-            const statsDiv = document.getElementById('historyStats');
-            statsDiv.innerHTML = `
-                <div class="stat-item">
-                    <div class="stat-value">${stats.totalSplits}</div>
-                    <div class="stat-label">Total Splits</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${stats.completedSplits}</div>
-                    <div class="stat-label">Completed</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${stats.pendingSplits}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">₹${stats.totalAmount.toFixed(2)}</div>
-                    <div class="stat-label">Total Amount</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${stats.completedSettlements}</div>
-                    <div class="stat-label">Settlements Done</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">${stats.pendingSettlements}</div>
-                    <div class="stat-label">Settlements Pending</div>
-                </div>
-            `;
-
-            // Display splits
-            const historyList = document.getElementById('historyList');
-            if (splits.length === 0) {
-                historyList.innerHTML = '<p style="text-align: center; color: #666;">No splits saved yet. Calculate and save a split to see history.</p>';
-                return;
-            }
-
-            historyList.innerHTML = splits.map(split => `
-                <div class="history-item">
-                    <div class="history-header">
-                        <div>
-                            <div class="history-title">Split #${split.id} - ${split.date} ${split.time}</div>
-                            <div class="history-date">
-                                Members: ${split.members.join(', ')} |
-                                Total: ₹${split.calculations.totalExpenses.toFixed(2)} |
-                                Expenses: ${split.expenses.length}
-                            </div>
-                        </div>
-                        <div>
-                            <span class="history-status ${split.status === 'completed' ? 'status-completed' : 'status-active'}">
-                                ${split.status === 'completed' ? '✅ Completed' : '⏳ Active'}
-                            </span>
-                            <button class="delete-btn" onclick="deleteSplit(${split.id})" style="margin-left: 10px; font-size: 12px;">Delete</button>
-                        </div>
-                    </div>
-                    <div class="settlements-list">
-                        ${split.settlements.length === 0 ?
-                            '<div style="text-align: center; color: #4CAF50; font-weight: bold;">🎉 All settled! No payments needed.</div>' :
-                            split.settlements.map(settlement => `
-                                <div class="settlement-item ${settlement.status === 'completed' ? 'settlement-completed' : ''}">
-                                    <div class="settlement-text">
-                                        ${settlement.from} pays ${settlement.to}
-                                    </div>
-                                    <div class="settlement-amount">₹${settlement.amount.toFixed(2)}</div>
-                                    <div>
-                                        ${settlement.status === 'completed' ?
-                                            `<button class="undo-btn" onclick="markSettlementPending(${split.id}, '${settlement.id}')">Undo</button>` :
-                                            `<button class="mark-done-btn" onclick="markSettlementDone(${split.id}, '${settlement.id}')">Mark Done</button>`
-                                        }
-                                    </div>
-                                </div>
-                            `).join('')
-                        }
+                    <div class="form-group">
+                        <label for="event-priority">Priority:</label>
+                        <select id="event-priority" required>
+                            <option value="">Select Priority</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
                     </div>
                 </div>
-            `).join('');
-        }
 
-        function markSettlementDone(splitId, settlementId) {
-            if (splitwiseDB.markSettlementCompleted(splitId, settlementId)) {
-                displayHistory();
-                showAutoSaveIndicator('✅ Settlement marked as completed');
-            }
-        }
-
-        function markSettlementPending(splitId, settlementId) {
-            if (splitwiseDB.markSettlementPending(splitId, settlementId)) {
-                displayHistory();
-                showAutoSaveIndicator('↩️ Settlement marked as pending');
-            }
-        }
-
-        function deleteSplit(splitId) {
-            if (confirm('Are you sure you want to delete this split? This action cannot be undone.')) {
-                if (splitwiseDB.deleteSplit(splitId)) {
-                    displayHistory();
-                    showAutoSaveIndicator('🗑️ Split deleted');
-                }
-            }
-        }
-
-        function clearHistory() {
-            if (confirm('Are you sure you want to clear all split history? This action cannot be undone.')) {
-                splitwiseDB.clearAllData();
-                // Reset the last saved data tracking after clearing history
-                lastSavedData = null;
-                displayHistory();
-                showAutoSaveIndicator('🗑️ All history cleared');
-            }
-        }
-
-
-
-        function showAutoSaveIndicator(message) {
-            let indicator = document.getElementById('autoSaveIndicator');
-            if (!indicator) {
-                indicator = document.createElement('div');
-                indicator.id = 'autoSaveIndicator';
-                indicator.className = 'auto-save-indicator';
-                document.body.appendChild(indicator);
-            }
-
-            indicator.textContent = message;
-            indicator.classList.add('show');
-
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 2000);
-        }
-
-        // Recalculation highlight functions
-        function markRecalculationNeeded() {
-            needsRecalculation = true;
-            const calculateBtn = document.getElementById('calculateBtn');
-            calculateBtn.classList.add('calculate-btn-highlight');
-
-            // Reset last saved data when changes are made
-            lastSavedData = null;
-        }
-
-        function clearRecalculationHighlight() {
-            needsRecalculation = false;
-            const calculateBtn = document.getElementById('calculateBtn');
-            calculateBtn.classList.remove('calculate-btn-highlight');
-        }
-
-        // Toggle section functionality
-        function toggleSection(contentId) {
-            const content = document.getElementById(contentId);
-            const arrow = document.getElementById(contentId.replace('Content', 'Arrow'));
-
-            if (content.classList.contains('show')) {
-                content.classList.remove('show');
-                arrow.classList.remove('rotated');
-            } else {
-                content.classList.add('show');
-                arrow.classList.add('rotated');
-            }
-        }
-
-        // Initialize application on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            updateMembersList();
-            updatePaidByDropdown();
-            updateOldBalanceDropdowns();
-            updateMemberCheckboxes();
-
-            // Set today's date as default for old balance date
-            document.getElementById('oldBalanceDate').value = new Date().toISOString().split('T')[0];
-
-            // Add event listener for amount input to update split summary
-            document.getElementById('expenseAmount').addEventListener('input', updateSplitSummary);
-
-            // Show welcome message
-            showAutoSaveIndicator('💰 Splitwise Calculator ready');
-        });
-
-        // Allow Enter key to add members and expenses
-        document.getElementById('memberName').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') addMember();
-        });
-
-        document.getElementById('expenseCategory').addEventListener('change', function(e) {
-            if (e.target.value) document.getElementById('expenseDescription').focus();
-        });
-
-        document.getElementById('expenseDescription').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') document.getElementById('expenseAmount').focus();
-        });
-
-        document.getElementById('expenseAmount').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') document.getElementById('paidBy').focus();
-        });
-
-        function downloadPDF() {
-            if (members.length === 0 || expenses.length === 0) {
-                alert('Please add members and expenses before downloading the report');
-                return;
-            }
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Calculate data for the report (same logic as calculateSplit)
-            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const perPersonShare = totalExpenses / members.length;
-
-            // Initialize balances for all members
-            const balances = {};
-            members.forEach(member => {
-                balances[member] = 0;
-            });
-
-            // Process each expense with correct advanced splitting logic
-            expenses.forEach(expense => {
-                const splitBetween = expense.splitBetween || members;
-                const perPersonShare = expense.amount / splitBetween.length;
-
-                // Person who paid gets credited
-                balances[expense.paidBy] += expense.amount;
-
-                // Only people who should split this expense get debited
-                splitBetween.forEach(member => {
-                    if (!balances[member]) balances[member] = 0;
-                    balances[member] -= perPersonShare;
-                });
-            });
-
-            // Add old balances to the calculation for PDF
-            oldBalances.forEach(oldBalance => {
-                if (!balances[oldBalance.from]) balances[oldBalance.from] = 0;
-                if (!balances[oldBalance.to]) balances[oldBalance.to] = 0;
-
-                balances[oldBalance.from] -= oldBalance.amount;
-                balances[oldBalance.to] += oldBalance.amount;
-            });
-
-            const settlements = generateSettlements(balances);
-
-            // Professional PDF Header
-            doc.setFontSize(20);
-            doc.setTextColor(76, 175, 80);
-            doc.text('EXPENSE SPLIT REPORT', 105, 25, { align: 'center' });
-
-            // Header underline
-            doc.setLineWidth(1);
-            doc.setDrawColor(76, 175, 80);
-            doc.line(40, 30, 170, 30);
-
-            // Info box with proper alignment
-            doc.setFillColor(248, 255, 248);
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(20, 35, 170, 18, 'FD');
-
-            doc.setFontSize(10);
-            doc.setTextColor(60, 60, 60);
-            doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 25, 42);
-            doc.text(`Time: ${new Date().toLocaleTimeString('en-IN')}`, 25, 48);
-            doc.text(`Prepared by: Varun Sreedharan`, 110, 42);
-            doc.text(`Total Items: ${expenses.length + oldBalances.length}`, 110, 48);
-
-            // Professional Summary Section
-            let yPos = 65;
-            doc.setFontSize(14);
-            doc.setTextColor(76, 175, 80);
-            doc.text('SUMMARY', 20, yPos);
-            doc.setLineWidth(0.5);
-            doc.line(20, yPos + 2, 55, yPos + 2);
-
-            yPos += 10;
-
-            // Summary table with proper alignment
-            doc.setFillColor(248, 248, 248);
-            doc.rect(20, yPos, 170, 25, 'F');
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(20, yPos, 170, 25);
-
-            doc.setFontSize(11);
-            doc.setTextColor(0, 0, 0);
-            doc.text('Total Expenses:', 25, yPos + 8);
-            doc.text(`Rs. ${totalExpenses.toFixed(2)}`, 150, yPos + 8, { align: 'right' });
-
-            doc.text('Total Members:', 25, yPos + 15);
-            doc.text(`${members.length}`, 150, yPos + 15, { align: 'right' });
-
-            doc.text('Per Person Share:', 25, yPos + 22);
-            doc.text(`Rs. ${perPersonShare.toFixed(2)}`, 150, yPos + 22, { align: 'right' });
-
-            yPos += 35;
-
-            // Professional Members Section
-            doc.setFontSize(14);
-            doc.setTextColor(76, 175, 80);
-            doc.text('MEMBERS', 20, yPos);
-            doc.setLineWidth(0.5);
-            doc.line(20, yPos + 2, 60, yPos + 2);
-
-            yPos += 10;
-            doc.setFontSize(11);
-            doc.setTextColor(0, 0, 0);
-
-            // Members table with alternating rows
-            members.forEach((member, index) => {
-                if (index % 2 === 0) {
-                    doc.setFillColor(248, 248, 248);
-                    doc.rect(20, yPos - 2, 170, 10, 'F');
-                }
-                doc.setDrawColor(220, 220, 220);
-                doc.rect(20, yPos - 2, 170, 10);
-
-                doc.setTextColor(60, 60, 60);
-                doc.text(`${index + 1}.`, 25, yPos + 4);
-                doc.text(member, 35, yPos + 4);
-                yPos += 10;
-            });
-
-            yPos += 10;
-
-            // Professional Expenses Section
-            doc.setFontSize(14);
-            doc.setTextColor(76, 175, 80);
-            doc.text('EXPENSES BREAKDOWN', 20, yPos);
-            doc.setLineWidth(0.5);
-            doc.line(20, yPos + 2, 95, yPos + 2);
-
-            yPos += 10;
-            doc.setFontSize(10);
-
-            let itemIndex = 0;
-
-            // Add old balances with professional formatting
-            if (oldBalances.length > 0) {
-                doc.setTextColor(244, 67, 54);
-                doc.text('Previous Balances:', 20, yPos);
-                yPos += 8;
-
-                oldBalances.forEach((balance) => {
-                    if (yPos > 240) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
-
-                    // Professional row formatting with better height
-                    if (itemIndex % 2 === 0) {
-                        doc.setFillColor(255, 248, 248);
-                        doc.rect(20, yPos - 2, 170, 18, 'F');
-                    }
-                    doc.setDrawColor(220, 220, 220);
-                    doc.rect(20, yPos - 2, 170, 18);
-
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(`${itemIndex + 1}.`, 25, yPos + 3);
-
-                    // Handle long text with word wrapping for old balances
-                    const balanceTitle = `[PREVIOUS] ${balance.description}`;
-                    const maxWidth = 80;
-                    const wrappedTitle = doc.splitTextToSize(balanceTitle, maxWidth);
-                    doc.text(wrappedTitle, 35, yPos + 3);
-
-                    // Amount aligned to the right
-                    doc.text(`Rs. ${balance.amount.toFixed(2)}`, 165, yPos + 3, { align: 'right' });
-
-                    // Second line with transaction details
-                    doc.setTextColor(100, 100, 100);
-                    doc.setFontSize(9);
-                    doc.text(`${balance.from} owes ${balance.to}`, 25, yPos + 10);
-                    doc.text(`Date: ${new Date(balance.date).toLocaleDateString('en-IN')}`, 25, yPos + 14);
-
-                    // Reset font size
-                    doc.setFontSize(10);
-                    doc.setTextColor(0, 0, 0);
-
-                    yPos += 20;
-                    itemIndex++;
-                });
-
-                yPos += 5;
-            }
-
-            // Add current expenses with professional formatting
-            if (expenses.length > 0) {
-                doc.setTextColor(76, 175, 80);
-                doc.text('Current Expenses:', 20, yPos);
-                yPos += 8;
-
-                expenses.forEach((expense) => {
-                    if (yPos > 240) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
-
-                    // Professional row formatting with better height
-                    if (itemIndex % 2 === 0) {
-                        doc.setFillColor(248, 255, 248);
-                        doc.rect(20, yPos - 2, 170, 18, 'F');
-                    }
-                    doc.setDrawColor(220, 220, 220);
-                    doc.rect(20, yPos - 2, 170, 18);
-
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(`${itemIndex + 1}.`, 25, yPos + 3);
-
-                    // Add category name instead of emoji for PDF compatibility
-                    const categoryName = getCategoryName(expense.category);
-                    const expenseTitle = `[${categoryName}] ${expense.description}`;
-
-                    // Handle long text with word wrapping
-                    const maxWidth = 80;
-                    const wrappedTitle = doc.splitTextToSize(expenseTitle, maxWidth);
-                    doc.text(wrappedTitle, 35, yPos + 3);
-
-                    // Amount aligned to the right
-                    doc.text(`Rs. ${expense.amount.toFixed(2)}`, 165, yPos + 3, { align: 'right' });
-
-                    // Second line with payment and split info
-                    doc.setTextColor(100, 100, 100);
-                    doc.setFontSize(9);
-                    doc.text(`Paid by: ${expense.paidBy}`, 25, yPos + 10);
-
-                    const splitInfo = expense.splitBetween ?
-                        `Split: ${expense.splitBetween.join(', ')}` :
-                        'Split: All members';
-                    const wrappedSplitInfo = doc.splitTextToSize(splitInfo, 80);
-                    doc.text(wrappedSplitInfo, 25, yPos + 14);
-
-                    // Reset font size
-                    doc.setFontSize(10);
-                    doc.setTextColor(0, 0, 0);
-
-                    yPos += 20;
-                    itemIndex++;
-                });
-            }
-
-            // Professional Individual Balances Section
-            if (yPos > 200) {
-                doc.addPage();
-                yPos = 20;
-            } else {
-                yPos += 10;
-            }
-
-            doc.setFontSize(14);
-            doc.setTextColor(76, 175, 80);
-            doc.text('INDIVIDUAL BALANCES', 20, yPos);
-            doc.setLineWidth(0.5);
-            doc.line(20, yPos + 2, 95, yPos + 2);
-
-            yPos += 10;
-            doc.setFontSize(11);
-
-            Object.entries(balances).forEach(([person, balance], index) => {
-                if (yPos > 270) {
-                    doc.addPage();
-                    yPos = 20;
-                }
-
-                // Professional table formatting
-                if (index % 2 === 0) {
-                    doc.setFillColor(248, 248, 248);
-                    doc.rect(20, yPos - 2, 170, 10, 'F');
-                }
-                doc.setDrawColor(220, 220, 220);
-                doc.rect(20, yPos - 2, 170, 10);
-
-                const status = balance > 0.01 ? 'Gets back' : balance < -0.01 ? 'Owes' : 'Settled';
-                const color = balance > 0.01 ? [76, 175, 80] : balance < -0.01 ? [244, 67, 54] : [100, 100, 100];
-
-                doc.setTextColor(0, 0, 0);
-                doc.text(person, 25, yPos + 4);
-                doc.setTextColor(color[0], color[1], color[2]);
-                doc.text(`${status}: Rs. ${Math.abs(balance).toFixed(2)}`, 120, yPos + 4);
-                yPos += 10;
-            });
-
-            // Professional Settlements Section
-            if (yPos > 200) {
-                doc.addPage();
-                yPos = 20;
-            } else {
-                yPos += 15;
-            }
-
-            doc.setFontSize(14);
-            doc.setTextColor(76, 175, 80);
-            doc.text('SETTLEMENT TRANSACTIONS', 20, yPos);
-            doc.setLineWidth(0.5);
-            doc.line(20, yPos + 2, 110, yPos + 2);
-
-            yPos += 10;
-            doc.setFontSize(11);
-            doc.setTextColor(0, 0, 0);
-
-            if (settlements.length === 0) {
-                doc.setFillColor(232, 245, 233);
-                doc.setDrawColor(76, 175, 80);
-                doc.rect(20, yPos, 170, 15, 'FD');
-                doc.setTextColor(76, 175, 80);
-                doc.text('✓ All settled! No payments needed.', 25, yPos + 8);
-                yPos += 20;
-            } else {
-                settlements.forEach((settlement, index) => {
-                    if (yPos > 270) {
-                        doc.addPage();
-                        yPos = 20;
-                    }
-
-                    // Professional table formatting
-                    if (index % 2 === 0) {
-                        doc.setFillColor(248, 248, 248);
-                        doc.rect(20, yPos - 2, 170, 12, 'F');
-                    }
-                    doc.setDrawColor(220, 220, 220);
-                    doc.rect(20, yPos - 2, 170, 12);
-
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(`${index + 1}.`, 25, yPos + 4);
-                    doc.text(`${settlement.from} pays ${settlement.to}`, 35, yPos + 4);
-                    doc.setTextColor(244, 67, 54);
-                    doc.text(`Rs. ${settlement.amount.toFixed(2)}`, 150, yPos + 4, { align: 'right' });
-                    yPos += 12;
-                });
-            }
-
-            // Professional Signature Section
-            if (yPos > 230) {
-                doc.addPage();
-                yPos = 20;
-            } else {
-                yPos += 25;
-            }
-
-            // Separator line
-            doc.setLineWidth(0.5);
-            doc.setDrawColor(200, 200, 200);
-            doc.line(20, yPos, 190, yPos);
-            yPos += 15;
-
-            // Signature area
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.text('Report prepared by:', 20, yPos);
-            yPos += 10;
-
-            // Professional signature box
-            doc.setFillColor(248, 255, 248);
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(20, yPos, 100, 20, 'FD');
-
-            doc.setFontSize(14);
-            doc.setTextColor(76, 175, 80);
-            doc.text('Varun Sreedharan', 25, yPos + 8);
-
-            doc.setFontSize(8);
-            doc.setTextColor(100, 100, 100);
-            doc.text('Digitally signed', 25, yPos + 14);
-            doc.text(`${new Date().toLocaleDateString('en-IN')} ${new Date().toLocaleTimeString('en-IN')}`, 25, yPos + 18);
-
-            // Footer with better formatting
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-
-                // Footer line
-                doc.setLineWidth(0.3);
-                doc.setDrawColor(200, 200, 200);
-                doc.line(20, 280, 190, 280);
-
-                doc.setFontSize(8);
-                doc.setTextColor(120, 120, 120);
-                doc.text('Generated by varuns', 20, 285);
-                doc.text(`Page ${i} of ${pageCount}`, 190, 285, { align: 'right' });
-            }
-
-            // Save the PDF with better filename
-            const fileName = `Expense_Split_Report_${new Date().toISOString().split('T')[0]}.pdf`;
-            doc.save(fileName);
-        }
-    </script>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Event
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="cancel-event">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
